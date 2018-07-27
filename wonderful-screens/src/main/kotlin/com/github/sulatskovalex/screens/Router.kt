@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import org.koin.KoinContext
 import org.koin.standalone.StandAloneContext
 
-class Router {
+open class Router {
   private val stack: MutableList<Screen<*, *, *>> = mutableListOf()
   private lateinit var activity: ScreensActivity
   private lateinit var container: ViewGroup
@@ -34,21 +34,24 @@ class Router {
     if (!stack.isEmpty()) {
       pause(current, destroy)
     }
-    val fragment: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
-    stack.add(fragment)
-    fragment.create(container)
-    (fragment as? InnerScreen)?.setInnerRouter(this)
-    activity.permissionsListener = fragment as? PermissionsListener
-    fragment.setArg(argument)
-    fragment.create()
-    if (fragment.state == Screen.Created) {
-      resume(fragment)
+    val screen: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
+    stack.add(screen)
+    screen.create(container)
+    (screen as? InnerScreen)?.setInnerRouter(this)
+    activity.setPermissionsListener(screen as? PermissionsListener)
+    activity.setActivityResultListener(screen as? OnActivityResultListener)
+    screen.setArg(argument)
+    screen.create()
+    if (screen.state == Screen.Created) {
+      resume(screen)
     }
   }
 
   fun <A : Any> setRoot(tag: String, arg: A) {
-    stack.forEach {
-      pause(it, true)
+    var index = stack.size - 1
+    while (index >= 0) {
+      pause(stack[index], true)
+      index--
     }
     forward(tag, arg)
   }
@@ -73,15 +76,14 @@ class Router {
     return false
   }
 
-  private fun resume(fragment: Screen<*, *, *>?) {
-    if (fragment == null) {
+  private fun resume(screen: Screen<*, *, *>?) {
+    if (screen == null) {
       return
     }
-    if (fragment.state == Screen.Created || fragment.state == Screen.Paused) {
-      fragment.view.removeFromParent()
-      fragment.addTo(container)
-      activity.permissionsListener = fragment.view as? PermissionsListener
-      fragment.resume()
+    if (screen.state == Screen.Created || screen.state == Screen.Paused) {
+      screen.view.removeFromParent()
+      screen.addTo(container)
+      screen.resume()
     }
   }
 
@@ -107,6 +109,23 @@ class Router {
     pause(current, false)
   }
 
+  fun back(tag: String) {
+    var index = stack.size - 1
+    val current = this.current
+    while (index >= 0) {
+      val screen = stack[index]
+      if (screen.screenTag == tag) {
+        if (screen != current) {
+          resume(screen)
+          break
+        }
+      } else {
+        pause(screen, true)
+      }
+      index --
+    }
+  }
+
   fun back() {
     activity.onBackPressed()
   }
@@ -119,6 +138,14 @@ class Router {
   private fun View.removeFromParent() {
     if (parent != null) {
       (parent as? ViewGroup)?.removeView(this)
+    }
+  }
+
+  fun onDestroy() {
+    var index = stack.size - 1
+    while (index >= 0) {
+      pause(stack[index], true)
+      index--
     }
   }
 }

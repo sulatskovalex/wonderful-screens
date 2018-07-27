@@ -14,6 +14,7 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
     presenter.view = this as Self
   }
 
+  abstract val  screenTag: String
   lateinit var view: android.view.View
   lateinit var activity: ScreensActivity
   var state = Initialized

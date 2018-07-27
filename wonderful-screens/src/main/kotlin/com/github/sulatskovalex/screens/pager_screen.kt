@@ -19,12 +19,13 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : Presenter<P, Self
 
   abstract val screenTags: Array<String>
   abstract val firstTag: String
-  private lateinit var adapter: PagerAdapter
+  protected lateinit var adapter: PagerAdapter
 
   override fun createView(parent: ViewGroup): View {
     val view = createViewWithRecycler(parent)
     val recyclerView = recycler(view)
     recyclerView.setItemViewCacheSize(screenTags.size)
+    recyclerView.setHasFixedSize(true)
     val manager = LinearLayoutManager(parent.context, LinearLayoutManager.HORIZONTAL, false)
     recyclerView.layoutManager = manager
     PagerSnapHelper().attachToRecyclerView(recyclerView)
@@ -92,6 +93,11 @@ class PagerAdapter(tags: Array<String>) : RecyclerView.Adapter<ScreenHolder>() {
     if (screen.state == Resumed) {
       screen.pause()
     }
+  }
+
+  fun handleBack(): Boolean {
+    val current = this.current
+    return current != null && current is BackPressedHandler && current.onBackPressed()
   }
 
   override fun onBindViewHolder(holder: ScreenHolder, position: Int) {}
