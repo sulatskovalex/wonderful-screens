@@ -7,7 +7,8 @@ import kotlinx.android.synthetic.main.screen_container.view.*
 import kotlinx.android.synthetic.main.screen_container_first.view.*
 import kotlinx.android.synthetic.main.screen_container_second.view.*
 
-class CScreen(presenter: CPresenter) : ContainerScreen<CScreen, CPresenter, Unit>(presenter) {
+class CScreen(presenter: CPresenter,
+              override val screenTag: String) : ContainerScreen<CScreen, CPresenter, Unit>(presenter) {
   override val firstScreenTag: String = CONTAINER1
 
   override fun createViewWithContainer(parent: ViewGroup): View =
@@ -17,9 +18,10 @@ class CScreen(presenter: CPresenter) : ContainerScreen<CScreen, CPresenter, Unit
 
 }
 
-class CPresenter(router: Router) : Presenter<CPresenter, CScreen, Unit>(router)
+class CPresenter(router: Router) : ContainerPresenter<CPresenter, CScreen, Unit>(router)
 
-class C1Screen(presenter: C1Presenter) : InnerScreen<C1Screen, C1Presenter, Unit>(presenter) {
+class C1Screen(presenter: C1Presenter,
+               override val screenTag: String) : InnerScreen<C1Screen, C1Presenter, Unit>(presenter) {
 
   override fun createView(parent: ViewGroup): View {
     val view = inflate(parent, R.layout.screen_container_first)
@@ -40,7 +42,8 @@ class C1Presenter(router: Router) : InnerPresenter<C1Presenter, C1Screen, Unit>(
   }
 }
 
-class C2Screen(presenter: C2Presenter) : InnerScreen<C2Screen, C2Presenter, Unit>(presenter) {
+class C2Screen(presenter: C2Presenter,
+               override val screenTag: String) : InnerScreen<C2Screen, C2Presenter, Unit>(presenter) {
   override fun createView(parent: ViewGroup): View {
     val view = inflate(parent, R.layout.screen_container_second)
     view.second_forward.setOnClickListener { presenter.onForwardClick() }

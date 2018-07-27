@@ -8,7 +8,8 @@ import com.github.sulatskovalex.screens.Screen
 import com.github.sulatskovalex.screens.inflate
 import kotlinx.android.synthetic.main.screen_main.view.*
 
-class MainScreen(presenter: MainPresenter) : Screen<MainScreen, MainPresenter, Unit>(presenter) {
+class MainScreen(presenter: MainPresenter,
+                 override val screenTag: String) : Screen<MainScreen, MainPresenter, Unit>(presenter) {
   override fun createView(parent: ViewGroup): View {
     val view: View = inflate(parent, R.layout.screen_main)
     view.forward.setOnClickListener { presenter.onForwardClick() }
