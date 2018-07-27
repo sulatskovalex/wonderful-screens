@@ -1,4 +1,4 @@
-package com.sulatskovalex.screens
+package com.github.sulatskovalex.screens
 
 import android.view.View
 import android.view.ViewGroup

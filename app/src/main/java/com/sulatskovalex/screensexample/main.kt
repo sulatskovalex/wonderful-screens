@@ -2,10 +2,10 @@ package com.sulatskovalex.screensexample
 
 import android.view.View
 import android.view.ViewGroup
-import com.sulatskovalex.screens.Presenter
-import com.sulatskovalex.screens.Router
-import com.sulatskovalex.screens.Screen
-import com.sulatskovalex.screens.inflate
+import com.github.sulatskovalex.screens.Presenter
+import com.github.sulatskovalex.screens.Router
+import com.github.sulatskovalex.screens.Screen
+import com.github.sulatskovalex.screens.inflate
 import kotlinx.android.synthetic.main.screen_main.view.*
 
 class MainScreen(presenter: MainPresenter) : Screen<MainScreen, MainPresenter, Unit>(presenter) {

@@ -2,9 +2,9 @@ package com.sulatskovalex.screensexample
 
 import android.app.Application
 import android.view.ViewGroup
-import com.sulatskovalex.screens.Router
-import com.sulatskovalex.screens.Screen
-import com.sulatskovalex.screens.ScreensActivity
+import com.github.sulatskovalex.screens.Router
+import com.github.sulatskovalex.screens.Screen
+import com.github.sulatskovalex.screens.ScreensActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.applicationContext

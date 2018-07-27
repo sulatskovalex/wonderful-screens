@@ -1,4 +1,4 @@
-package com.sulatskovalex.screens
+package com.github.sulatskovalex.screens
 
 import android.content.Context
 import android.support.annotation.CallSuper

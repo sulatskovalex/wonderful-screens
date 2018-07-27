@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
   compileSdkVersion compile_sdk_version
@@ -43,4 +44,12 @@ kotlin {
   experimental {
     coroutines "enable"
   }
+}
+publish {
+  userOrg = 'sulatskovalex'
+  groupId = 'com.github'
+  artifactId = 'wonderful-screens'
+  publishVersion = '0.0.1'
+  desc = 'wonderful-screens'
+  website = 'https://github.com/sulatskovalex/wonderful-screens'
 }

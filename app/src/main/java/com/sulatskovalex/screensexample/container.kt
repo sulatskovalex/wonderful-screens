@@ -2,7 +2,7 @@ package com.sulatskovalex.screensexample
 
 import android.view.View
 import android.view.ViewGroup
-import com.sulatskovalex.screens.*
+import com.github.sulatskovalex.screens.*
 import kotlinx.android.synthetic.main.screen_container.view.*
 import kotlinx.android.synthetic.main.screen_container_first.view.*
 import kotlinx.android.synthetic.main.screen_container_second.view.*

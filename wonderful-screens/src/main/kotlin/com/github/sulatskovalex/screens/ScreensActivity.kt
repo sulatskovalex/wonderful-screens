@@ -1,4 +1,4 @@
-package com.sulatskovalex.screens
+package com.github.sulatskovalex.screens
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity

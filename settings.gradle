@@ -1,1 +1,1 @@
-include ':app', ':screens'
+include ':app', ':wonderful-screens'

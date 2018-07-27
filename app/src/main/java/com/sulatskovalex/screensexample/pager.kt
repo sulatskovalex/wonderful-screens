@@ -2,7 +2,7 @@ package com.sulatskovalex.screensexample
 
 import android.view.View
 import android.view.ViewGroup
-import com.sulatskovalex.screens.*
+import com.github.sulatskovalex.screens.*
 
 class PagScreen(presenter: PagPresenter) : PagerScreen<PagScreen, PagPresenter, Unit>(presenter) {
   override val screenTags = arrayOf(PAGER1, PAGER2, PAGER3)

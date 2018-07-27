@@ -1,14 +1,14 @@
-package com.sulatskovalex.screens
+package com.github.sulatskovalex.screens
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import com.sulatskovalex.screens.Screen.Companion.Created
-import com.sulatskovalex.screens.Screen.Companion.Initialized
-import com.sulatskovalex.screens.Screen.Companion.Paused
-import com.sulatskovalex.screens.Screen.Companion.Resumed
+import com.github.sulatskovalex.screens.Screen.Companion.Created
+import com.github.sulatskovalex.screens.Screen.Companion.Initialized
+import com.github.sulatskovalex.screens.Screen.Companion.Paused
+import com.github.sulatskovalex.screens.Screen.Companion.Resumed
 import kotlinx.android.synthetic.main.screen_pager.view.*
 import org.koin.KoinContext
 import org.koin.standalone.StandAloneContext
