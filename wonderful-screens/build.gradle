@@ -9,7 +9,7 @@ android {
     buildToolsVersion build_tools_version
     targetSdkVersion target_sdk_version
     versionCode 1
-    versionName "1.0"
+    versionName "0.0.3"
   }
 
   buildTypes {
