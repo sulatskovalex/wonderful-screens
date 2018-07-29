@@ -54,7 +54,9 @@ open class Router {
       val screen = stack[index]
       if (screen.screenTag == tag) {
         if (screen != current) {
-          (screen as Screen<*, *, A>).setArg(arg)
+          if (arg !== Unit) {
+            (screen as Screen<*, *, A>).setArg(arg)
+          }
           resume(screen)
           break
         }
@@ -79,11 +81,11 @@ open class Router {
     (screen as? InnerScreen)?.setInnerRouter(this)
     activity.permissionsListener = screen as? PermissionsListener
     activity.activityResultListener = screen as? OnActivityResultListener
-    screen.setArg(argument)
-    screen.create()
-    if (screen.state == Screen.Created) {
-      resume(screen)
+    if (argument !== Unit) {
+      screen.setArg(argument)
     }
+    screen.create()
+    resume(screen)
   }
 
   fun handleBack(): Boolean {
@@ -97,7 +99,7 @@ open class Router {
       }
       pause(current, true)
       resume(this.current)
-      return !stack.isEmpty()
+      return stack.isNotEmpty()
     }
     return false
   }
@@ -127,11 +129,11 @@ open class Router {
     }
   }
 
-  fun onResume() {
+  internal fun onResume() {
     resume(current)
   }
 
-  fun onPause() {
+  internal fun onPause() {
     pause(current, false)
   }
 
@@ -146,7 +148,7 @@ open class Router {
     }
   }
 
-  fun onDestroy() {
+  internal fun onDestroy() {
     var index = stack.size - 1
     while (index >= 0) {
       pause(stack[index], true)
