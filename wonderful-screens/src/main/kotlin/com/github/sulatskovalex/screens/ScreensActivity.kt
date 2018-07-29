@@ -1,13 +1,14 @@
-package com.sulatskovalex.screens
+package com.github.sulatskovalex.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
-import org.koin.android.ext.android.inject
 
 abstract class ScreensActivity : AppCompatActivity() {
-  protected val router: Router by inject()
+  protected abstract val router: Router
   var permissionsListener: PermissionsListener? = null
+  var activityResultListener: OnActivityResultListener? = null
 
   abstract val contentId: Int
   abstract val container: ViewGroup
@@ -18,6 +19,10 @@ abstract class ScreensActivity : AppCompatActivity() {
     setContentView(contentId)
     router.attachToContainer(container)
     router.setRoot(firstScreenTag)
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    activityResultListener?.onActivityResult(requestCode, resultCode, data)
   }
 
   override fun onResume() {
@@ -48,4 +53,8 @@ interface PermissionsListener {
 
 interface BackPressedHandler {
   fun onBackPressed(): Boolean
+}
+
+interface OnActivityResultListener {
+  fun onActivityResult(reqCode: Int, resCode: Int, data: Intent?)
 }

@@ -2,10 +2,11 @@ package com.sulatskovalex.screensexample
 
 import android.app.Application
 import android.view.ViewGroup
-import com.sulatskovalex.screens.Router
-import com.sulatskovalex.screens.Screen
-import com.sulatskovalex.screens.ScreensActivity
+import com.github.sulatskovalex.screens.Router
+import com.github.sulatskovalex.screens.Screen
+import com.github.sulatskovalex.screens.ScreensActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.applicationContext
 
@@ -19,6 +20,7 @@ const val PAGER2 = "Pager2"
 const val PAGER3 = "PAGER3"
 
 class MainActivity : ScreensActivity() {
+  override val router: Router by inject()
   override val contentId: Int
     get() = R.layout.activity_main
   override val container: ViewGroup
@@ -37,28 +39,28 @@ class App : Application() {
 val mainModule = applicationContext {
   bean { Router() }
 
-  factory(MAIN) { MainScreen(get()) as Screen<*, *, *> }
+  factory(MAIN) { MainScreen(get(), MAIN) as Screen<*, *, *> }
   factory { MainPresenter(get()) }
 
-  factory(CONTAINER) { CScreen(get()) as Screen<*, *, *> }
+  factory(CONTAINER) { CScreen(get(), CONTAINER) as Screen<*, *, *> }
   factory { CPresenter(get()) }
 
-  factory(CONTAINER1) { C1Screen(get()) as Screen<*, *, *> }
+  factory(CONTAINER1) { C1Screen(get(), CONTAINER1) as Screen<*, *, *> }
   factory { C1Presenter(get()) }
 
-  factory(CONTAINER2) { C2Screen(get()) as Screen<*, *, *> }
+  factory(CONTAINER2) { C2Screen(get(), CONTAINER2) as Screen<*, *, *> }
   factory { C2Presenter(get()) }
 
-  factory(PAGER) { PagScreen(get()) as Screen<*, *, *> }
+  factory(PAGER) { PagScreen(get(), PAGER) as Screen<*, *, *> }
   factory { PagPresenter(get()) }
 
-  factory(PAGER1) { P1Screen(get()) as Screen<*, *, *> }
+  factory(PAGER1) { P1Screen(get(), PAGER1) as Screen<*, *, *> }
   factory { P1Presenter(get()) }
 
-  factory(PAGER2) { P2Screen(get()) as Screen<*, *, *> }
+  factory(PAGER2) { P2Screen(get(), PAGER2) as Screen<*, *, *> }
   factory { P2Presenter(get()) }
 
-  factory(PAGER3) { P3Screen(get()) as Screen<*, *, *> }
+  factory(PAGER3) { P3Screen(get(), PAGER3) as Screen<*, *, *> }
   factory { P3Presenter(get()) }
 
 }

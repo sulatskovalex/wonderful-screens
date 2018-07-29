@@ -4,7 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Screensexample.iml" filepath="$PROJECT_DIR$/Screensexample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/screens/screens.iml" filepath="$PROJECT_DIR$/screens/screens.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wonderful-screens/screens.iml" filepath="$PROJECT_DIR$/wonderful-screens/screens.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wonderful-screens/wonderful-screens.iml" filepath="$PROJECT_DIR$/wonderful-screens/wonderful-screens.iml" />
     </modules>
   </component>
 </project>

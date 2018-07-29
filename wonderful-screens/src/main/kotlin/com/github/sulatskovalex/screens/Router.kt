@@ -1,11 +1,11 @@
-package com.sulatskovalex.screens
+package com.github.sulatskovalex.screens
 
 import android.view.View
 import android.view.ViewGroup
 import org.koin.KoinContext
 import org.koin.standalone.StandAloneContext
 
-class Router {
+open class Router {
   private val stack: MutableList<Screen<*, *, *>> = mutableListOf()
   private lateinit var activity: ScreensActivity
   private lateinit var container: ViewGroup
@@ -30,31 +30,60 @@ class Router {
     replace(tag, arg, true)
   }
 
-  private fun <A : Any> replace(tag: String, argument: A, destroy: Boolean) {
-    if (!stack.isEmpty()) {
-      pause(current, destroy)
-    }
-    val fragment: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
-    stack.add(fragment)
-    fragment.create(container)
-    (fragment as? InnerScreen)?.setInnerRouter(this)
-    activity.permissionsListener = fragment as? PermissionsListener
-    fragment.setArg(argument)
-    fragment.create()
-    if (fragment.state == Screen.Created) {
-      resume(fragment)
-    }
-  }
-
   fun <A : Any> setRoot(tag: String, arg: A) {
-    stack.forEach {
-      pause(it, true)
+    var index = stack.size - 1
+    while (index >= 0) {
+      pause(stack[index], true)
+      index--
     }
     forward(tag, arg)
   }
 
   fun setRoot(tag: String) {
     setRoot(tag, Unit)
+  }
+
+  fun backTo(tag: String) {
+    backTo(tag, Unit)
+  }
+
+  fun <A : Any> backTo(tag: String, arg: A) {
+    var index = stack.size - 1
+    val current = this.current
+    while (index >= 0) {
+      val screen = stack[index]
+      if (screen.screenTag == tag) {
+        if (screen != current) {
+          (screen as Screen<*, *, A>).setArg(arg)
+          resume(screen)
+          break
+        }
+      } else {
+        pause(screen, true)
+      }
+      index--
+    }
+  }
+
+  fun back() {
+    activity.onBackPressed()
+  }
+
+  private fun <A : Any> replace(tag: String, argument: A, destroy: Boolean) {
+    if (!stack.isEmpty()) {
+      pause(current, destroy)
+    }
+    val screen: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
+    stack.add(screen)
+    screen.create(container)
+    (screen as? InnerScreen)?.setInnerRouter(this)
+    activity.permissionsListener = screen as? PermissionsListener
+    activity.activityResultListener = screen as? OnActivityResultListener
+    screen.setArg(argument)
+    screen.create()
+    if (screen.state == Screen.Created) {
+      resume(screen)
+    }
   }
 
   fun handleBack(): Boolean {
@@ -73,15 +102,14 @@ class Router {
     return false
   }
 
-  private fun resume(fragment: Screen<*, *, *>?) {
-    if (fragment == null) {
+  private fun resume(screen: Screen<*, *, *>?) {
+    if (screen == null) {
       return
     }
-    if (fragment.state == Screen.Created || fragment.state == Screen.Paused) {
-      fragment.view.removeFromParent()
-      fragment.addTo(container)
-      activity.permissionsListener = fragment.view as? PermissionsListener
-      fragment.resume()
+    if (screen.state == Screen.Created || screen.state == Screen.Paused) {
+      screen.view.removeFromParent()
+      screen.attachTo(container)
+      screen.resume()
     }
   }
 
@@ -107,10 +135,6 @@ class Router {
     pause(current, false)
   }
 
-  fun back() {
-    activity.onBackPressed()
-  }
-
   fun attachToContainer(container: ViewGroup) {
     this.container = container
     this.activity = container.context as ScreensActivity
@@ -119,6 +143,14 @@ class Router {
   private fun View.removeFromParent() {
     if (parent != null) {
       (parent as? ViewGroup)?.removeView(this)
+    }
+  }
+
+  fun onDestroy() {
+    var index = stack.size - 1
+    while (index >= 0) {
+      pause(stack[index], true)
+      index--
     }
   }
 }
