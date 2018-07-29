@@ -1,5 +1,6 @@
 package com.github.sulatskovalex.screens
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
@@ -9,11 +10,11 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
   abstract val firstScreenTag: String
   private val delegate = Router()
 
-  abstract fun createViewWithContainer(parent: ViewGroup): View
+  abstract fun createViewWithContainer(inflater: LayoutInflater, parent: ViewGroup): View
 
 
-  override fun createView(parent: ViewGroup): View {
-    val view = createViewWithContainer(parent)
+  override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
+    val view = createViewWithContainer(inflater, parent)
     val container = container(view)
     delegate.attachToContainer(container)
     delegate.setRoot(firstScreenTag)
@@ -36,7 +37,7 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
     delegate.onDestroy()
   }
 
-  abstract fun container(view: View): ViewGroup
+  abstract fun container(createdView: View): ViewGroup
 
   override fun onBackPressed(): Boolean = delegate.handleBack()
 }

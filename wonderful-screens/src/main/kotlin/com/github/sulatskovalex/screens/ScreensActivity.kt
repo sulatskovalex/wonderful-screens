@@ -7,8 +7,8 @@ import android.view.ViewGroup
 
 abstract class ScreensActivity : AppCompatActivity() {
   protected abstract val router: Router
-  private var permissionsListener: PermissionsListener? = null
-  private var activityResultListener: OnActivityResultListener? = null
+  var permissionsListener: PermissionsListener? = null
+  var activityResultListener: OnActivityResultListener? = null
 
   abstract val contentId: Int
   abstract val container: ViewGroup
@@ -45,15 +45,6 @@ abstract class ScreensActivity : AppCompatActivity() {
       requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
     permissionsListener?.onRequestPermissionsResult(requestCode, permissions, grantResults)
   }
-
-  fun setPermissionsListener(permissionsListener: PermissionsListener?) {
-    this.permissionsListener = permissionsListener
-  }
-
-  fun setActivityResultListener(onActivityResultListener: OnActivityResultListener?) {
-    this.activityResultListener = onActivityResultListener
-  }
-
 }
 
 interface PermissionsListener {

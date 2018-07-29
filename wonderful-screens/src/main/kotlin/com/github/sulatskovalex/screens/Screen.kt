@@ -3,7 +3,6 @@ package com.github.sulatskovalex.screens
 import android.content.Context
 import android.support.annotation.CallSuper
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.experimental.Job
@@ -14,28 +13,27 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
     presenter.view = this as Self
   }
 
-  abstract val  screenTag: String
+  abstract val screenTag: String
   lateinit var view: android.view.View
   lateinit var activity: ScreensActivity
+  lateinit var inflater: LayoutInflater
   var state = Initialized
+    private set
 
   fun create(parent: ViewGroup) {
     this.activity = parent.context as ScreensActivity
-    this.view = createView(parent)
+    this.inflater = LayoutInflater.from(parent.context)
+    this.view = createView(inflater, parent)
   }
 
-  abstract fun createView(parent: ViewGroup): android.view.View
+  abstract fun createView(inflater: LayoutInflater, parent: ViewGroup): android.view.View
 
   fun hideKeyBoard() {
     (activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)?.hideSoftInputFromWindow(
         (activity.currentFocus ?: view).windowToken, 0)
   }
 
-  open fun removeFrom(container: ViewGroup) {
-    container.removeView(view)
-  }
-
-  open fun addTo(container: ViewGroup) {
+  open fun attachTo(container: ViewGroup) {
     container.addView(view)
   }
 
@@ -88,6 +86,3 @@ open class Presenter<Self : Presenter<Self, S, A>, S : Screen<S, Self, A>, A : A
     jobs.forEach { it.cancel() }
   }
 }
-
-fun Screen<*, *, *>.inflate(container: ViewGroup, layoutId: Int): View =
-    LayoutInflater.from(activity).inflate(layoutId, container, false)

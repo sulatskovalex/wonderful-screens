@@ -1,5 +1,6 @@
 package com.sulatskovalex.screensexample
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.sulatskovalex.screens.*
@@ -11,10 +12,10 @@ class CScreen(presenter: CPresenter,
               override val screenTag: String) : ContainerScreen<CScreen, CPresenter, Unit>(presenter) {
   override val firstScreenTag: String = CONTAINER1
 
-  override fun createViewWithContainer(parent: ViewGroup): View =
-      inflate(parent, R.layout.screen_container)
+  override fun createViewWithContainer(inflater: LayoutInflater, parent: ViewGroup): View =
+      inflater.inflate(R.layout.screen_container, parent, false)
 
-  override fun container(view: View): ViewGroup = view.container
+  override fun container(createdView: View): ViewGroup = createdView.container
 
 }
 
@@ -23,8 +24,8 @@ class CPresenter(router: Router) : ContainerPresenter<CPresenter, CScreen, Unit>
 class C1Screen(presenter: C1Presenter,
                override val screenTag: String) : InnerScreen<C1Screen, C1Presenter, Unit>(presenter) {
 
-  override fun createView(parent: ViewGroup): View {
-    val view = inflate(parent, R.layout.screen_container_first)
+  override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
+    val view = inflater.inflate(R.layout.screen_container_first, parent, false)
     view.first_replace.setOnClickListener { presenter.onReplaceClick() }
     view.first_back.setOnClickListener { presenter.onBackClick() }
     return view
@@ -44,8 +45,8 @@ class C1Presenter(router: Router) : InnerPresenter<C1Presenter, C1Screen, Unit>(
 
 class C2Screen(presenter: C2Presenter,
                override val screenTag: String) : InnerScreen<C2Screen, C2Presenter, Unit>(presenter) {
-  override fun createView(parent: ViewGroup): View {
-    val view = inflate(parent, R.layout.screen_container_second)
+  override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
+    val view = inflater.inflate(R.layout.screen_container_second, parent, false)
     view.second_forward.setOnClickListener { presenter.onForwardClick() }
     view.second_replace.setOnClickListener { presenter.onReplaceClick() }
     view.second_back.setOnClickListener { presenter.onBackClick() }
