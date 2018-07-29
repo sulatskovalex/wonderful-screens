@@ -39,7 +39,6 @@ class P1Screen(presenter: P1Presenter,
                override val screenTag: String) : Screen<P1Screen, P1Presenter, Unit>(presenter) {
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View =
       inflater.inflate(R.layout.screen_page_first, parent, false)
-
 }
 
 class P1Presenter(router: Router) : Presenter<P1Presenter, P1Screen, Unit>(router)
@@ -48,7 +47,6 @@ class P2Screen(presenter: P2Presenter, override val screenTag: String)
   : Screen<P2Screen, P2Presenter, Unit>(presenter) {
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View =
       inflater.inflate(R.layout.screen_page_second, parent, false)
-
 }
 
 class P2Presenter(router: Router) : Presenter<P2Presenter, P2Screen, Unit>(router)
@@ -57,7 +55,6 @@ class P3Screen(presenter: P3Presenter, override val screenTag: String)
   : Screen<P3Screen, P3Presenter, Unit>(presenter) {
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View =
       inflater.inflate(R.layout.screen_page_third, parent, false)
-
 }
 
 class P3Presenter(router: Router) : Presenter<P3Presenter, P3Screen, Unit>(router)

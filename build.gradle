@@ -11,6 +11,7 @@ buildscript {
     ext.target_sdk_version = 27
     ext.compile_sdk_version = 27
     ext.min_sdk_version = 15
+    ext.screens_version = '0.0.3'
     repositories {
         google()
         jcenter()

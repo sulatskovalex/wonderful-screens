@@ -9,7 +9,7 @@ android {
     buildToolsVersion build_tools_version
     targetSdkVersion target_sdk_version
     versionCode 1
-    versionName "0.0.3"
+    versionName screens_version
   }
 
   buildTypes {
@@ -30,7 +30,7 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "com.android.support:appcompat-v7:$support_version"
   implementation "com.android.support:recyclerview-v7:$support_version"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"

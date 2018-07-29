@@ -2,6 +2,7 @@ package com.github.sulatskovalex.screens
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 
@@ -25,16 +26,19 @@ abstract class ScreensActivity : AppCompatActivity() {
     activityResultListener?.onActivityResult(requestCode, resultCode, data)
   }
 
+  @CallSuper
   override fun onResume() {
     router.onResume()
     super.onResume()
   }
 
+  @CallSuper
   override fun onPause() {
     router.onPause()
     super.onPause()
   }
 
+  @CallSuper
   override fun onBackPressed() {
     if (!router.handleBack()) {
       super.onBackPressed()
