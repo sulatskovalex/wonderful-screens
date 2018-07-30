@@ -8,8 +8,9 @@ import com.github.sulatskovalex.screens.Router
 import com.github.sulatskovalex.screens.Screen
 import kotlinx.android.synthetic.main.screen_main.view.*
 
-class MainScreen(presenter: MainPresenter,
-                 override val screenTag: String) : Screen<MainScreen, MainPresenter, Unit>(presenter) {
+class MainScreen(presenter: MainPresenter, override val screenTag: String)
+  : Screen<MainScreen, MainPresenter, Unit>(presenter) {
+
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view: View = inflater.inflate(R.layout.screen_main, parent, false)
     view.forward.setOnClickListener { presenter.onForwardClick() }
@@ -21,6 +22,7 @@ class MainScreen(presenter: MainPresenter,
 }
 
 class MainPresenter(router: Router) : Presenter<MainPresenter, MainScreen, Unit>(router) {
+
   fun onContainerClick() {
     router.forward(CONTAINER)
   }

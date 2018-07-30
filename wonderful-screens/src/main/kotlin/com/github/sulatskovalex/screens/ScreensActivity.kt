@@ -7,14 +7,15 @@ import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 
 abstract class ScreensActivity : AppCompatActivity() {
-  protected abstract val router: Router
-  var permissionsListener: PermissionsListener? = null
-  var activityResultListener: OnActivityResultListener? = null
 
+  protected abstract val router: Router
   abstract val contentId: Int
   abstract val container: ViewGroup
   abstract val firstScreenTag: String
+  var permissionsListener: PermissionsListener? = null
+  var activityResultListener: OnActivityResultListener? = null
 
+  @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(contentId)
@@ -22,6 +23,7 @@ abstract class ScreensActivity : AppCompatActivity() {
     router.setRoot(firstScreenTag)
   }
 
+  @CallSuper
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     activityResultListener?.onActivityResult(requestCode, resultCode, data)
   }
@@ -38,13 +40,18 @@ abstract class ScreensActivity : AppCompatActivity() {
     super.onPause()
   }
 
-  @CallSuper
-  override fun onBackPressed() {
-    if (!router.handleBack()) {
+  fun <A : Any> onBackPressed(arg: A) {
+    if (!router.handleBack(arg)) {
       super.onBackPressed()
     }
   }
 
+  @CallSuper
+  override fun onBackPressed() {
+    onBackPressed(Unit)
+  }
+
+  @CallSuper
   override fun onRequestPermissionsResult(
       requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
     permissionsListener?.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -56,7 +63,7 @@ interface PermissionsListener {
 }
 
 interface BackPressedHandler {
-  fun onBackPressed(): Boolean
+  fun <A : Any> onBackPressed(arg: A): Boolean
 }
 
 interface OnActivityResultListener {
