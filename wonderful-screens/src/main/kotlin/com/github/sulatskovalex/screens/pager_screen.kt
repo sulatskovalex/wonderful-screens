@@ -102,7 +102,7 @@ interface PagerRouter {
   fun openTab(tag: String)
 }
 
-abstract class PagerPresenter<Self : PagerPresenter<Self, S, A>, S : PagerScreen<S, Self, A>, A : Any>(router: Router)
+class PagerPresenter<Self : PagerPresenter<Self, S, A>, S : PagerScreen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var pagerRouter: PagerRouter
 }
