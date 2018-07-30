@@ -52,7 +52,7 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
   override fun<A: Any> onBackPressed(arg: A): Boolean = router.handleBack(arg)
 }
 
-class ContainerPresenter<Self : ContainerPresenter<Self, S, A>, S : ContainerScreen<S, Self, A>, A : Any>(router: Router)
+open class ContainerPresenter<Self : ContainerPresenter<Self, S, A>, S : ContainerScreen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var innerRouter: Router
 }
@@ -65,7 +65,7 @@ abstract class InnerScreen<Self : InnerScreen<Self, P, A>, P : InnerPresenter<P,
   }
 }
 
-class InnerPresenter<Self : InnerPresenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(router: Router)
+open class InnerPresenter<Self : InnerPresenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var innerRouter: Router
 }
