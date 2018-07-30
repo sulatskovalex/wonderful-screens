@@ -22,21 +22,23 @@ class PagScreen(presenter: PagPresenter, override val screenTag: String)
 }
 
 class PagPresenter(router: Router) : PagerPresenter<PagPresenter, PagScreen, Unit>(router) {
+
   fun onFirstPageClick() {
-    pagerRouter.open(PAGER1)
+    pagerRouter.openTab(PAGER1)
   }
 
   fun onSecondPageClick() {
-    pagerRouter.open(PAGER2)
+    pagerRouter.openTab(PAGER2)
   }
 
   fun onThirdPageClick() {
-    pagerRouter.open(PAGER3)
+    pagerRouter.openTab(PAGER3)
   }
 }
 
-class P1Screen(presenter: P1Presenter,
-               override val screenTag: String) : Screen<P1Screen, P1Presenter, Unit>(presenter) {
+class P1Screen(presenter: P1Presenter, override val screenTag: String)
+  : Screen<P1Screen, P1Presenter, Unit>(presenter) {
+
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View =
       inflater.inflate(R.layout.screen_page_first, parent, false)
 }
@@ -45,6 +47,7 @@ class P1Presenter(router: Router) : Presenter<P1Presenter, P1Screen, Unit>(route
 
 class P2Screen(presenter: P2Presenter, override val screenTag: String)
   : Screen<P2Screen, P2Presenter, Unit>(presenter) {
+
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View =
       inflater.inflate(R.layout.screen_page_second, parent, false)
 }
