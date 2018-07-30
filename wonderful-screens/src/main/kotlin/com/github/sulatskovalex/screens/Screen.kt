@@ -38,7 +38,9 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   }
 
   open fun setArg(arg: A) {
-    presenter.argument = arg
+    if(arg::class.java == presenter.argumentClass) {
+      presenter.argument = arg
+    }
   }
 
   @CallSuper
@@ -78,6 +80,8 @@ open class Presenter<Self : Presenter<Self, S, A>, S : Screen<S, Self, A>, A : A
   protected val jobs = mutableListOf<Job>()
   lateinit var view: S
   lateinit var argument: A
+  open var argumentClass: Class<A> = Any::class.java as Class<A>
+
   open fun onResume() {}
   open fun onCreate() {}
   open fun onPause() {}

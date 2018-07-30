@@ -38,6 +38,13 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
     return view
   }
 
+  override fun setArg(arg: A) {
+    if(arg::class.java == presenter.argumentClass) {
+      super.setArg(arg)
+    }
+    adapter.setArg(arg)
+  }
+
   protected open fun createViewWithRecycler(inflater: LayoutInflater, parent: ViewGroup): View =
       RecyclerView(activity)
 
@@ -55,8 +62,8 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
   }
 
   @CallSuper
-  override fun onBackPressed(): Boolean {
-    return adapter.handleBack()
+  override fun <A: Any> onBackPressed(arg: A): Boolean {
+    return adapter.handleBack(arg)
   }
 
   @CallSuper
@@ -78,12 +85,12 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
   }
 
   @CallSuper
-  override fun open(tag: String) {
-    open(tag, Unit)
+  override fun openTab(tag: String) {
+    openTab(tag, Unit)
   }
 
   @CallSuper
-  override fun <A : Any> open(tag: String, arg: A) {
+  override fun <A : Any> openTab(tag: String, arg: A) {
     val indexOf = adapter.getIndexOf(tag)
     adapter.scrollTo(indexOf, arg)
     layoutManager.scrollToPosition(indexOf)
@@ -91,11 +98,11 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
 }
 
 interface PagerRouter {
-  fun <A : Any> open(tag: String, arg: A)
-  fun open(tag: String)
+  fun <A : Any> openTab(tag: String, arg: A)
+  fun openTab(tag: String)
 }
 
-open class PagerPresenter<Self : PagerPresenter<Self, S, A>, S : PagerScreen<S, Self, A>, A : Any>(router: Router)
+abstract class PagerPresenter<Self : PagerPresenter<Self, S, A>, S : PagerScreen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var pagerRouter: PagerRouter
 }
@@ -137,9 +144,9 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
     }
   }
 
-  fun handleBack(): Boolean {
+  fun <A: Any> handleBack(arg: A): Boolean {
     val current = this.current
-    return current != null && current is BackPressedHandler && current.onBackPressed()
+    return current != null && current is BackPressedHandler && current.onBackPressed(arg)
   }
 
   override fun onBindViewHolder(holder: ScreenHolder, position: Int) {}
@@ -169,9 +176,7 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
   }
 
   fun <A : Any> scrollTo(screenIndex: Int, arg: A) {
-    if (arg !== Unit) {
-      (screens[screenIndex] as Screen<*, *, A>).setArg(arg)
-    }
+    (screens[screenIndex] as? Screen<*, *, A>)?.setArg(arg)
   }
 
   fun getIndexOf(tag: String): Int {
@@ -181,5 +186,9 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
       }
     }
     throw Throwable("screen with tag $tag is not exist in pager")
+  }
+
+  fun <A: Any> setArg(arg: A) {
+    (current as? Screen<*, *, A>?)?.setArg(arg)
   }
 }

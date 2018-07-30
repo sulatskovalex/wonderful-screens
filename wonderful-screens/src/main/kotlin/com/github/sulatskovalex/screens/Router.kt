@@ -54,9 +54,7 @@ open class Router {
       val screen = stack[index]
       if (screen.screenTag == tag) {
         if (screen != current) {
-          if (arg !== Unit) {
-            (screen as Screen<*, *, A>).setArg(arg)
-          }
+          (screen as? Screen<*, *, A>)?.setArg(arg)
           resume(screen)
           break
         }
@@ -67,8 +65,12 @@ open class Router {
     }
   }
 
+  fun <A: Any> back(arg: A) {
+    activity.onBackPressed(arg)
+  }
+
   fun back() {
-    activity.onBackPressed()
+    back(Unit)
   }
 
   private fun <A : Any> replace(tag: String, argument: A, destroy: Boolean) {
@@ -81,23 +83,26 @@ open class Router {
     (screen as? InnerScreen)?.setInnerRouter(this)
     activity.permissionsListener = screen as? PermissionsListener
     activity.activityResultListener = screen as? OnActivityResultListener
-    if (argument !== Unit) {
-      screen.setArg(argument)
-    }
+    screen.setArg(argument)
     screen.create()
     resume(screen)
   }
 
   fun handleBack(): Boolean {
+    return handleBack(Unit)
+  }
+
+  fun<A: Any> handleBack(arg: A): Boolean {
     if (!stack.isEmpty()) {
       val current = current
       if (current is BackPressedHandler) {
-        val handled = current.onBackPressed()
+        val handled = current.onBackPressed(arg)
         if (handled) {
           return true
         }
       }
       pause(current, true)
+      (this.current as? Screen<*, *, A>?)?.setArg(arg)
       resume(this.current)
       return stack.isNotEmpty()
     }
