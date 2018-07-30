@@ -23,6 +23,13 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
     return view
   }
 
+  override fun setArg(arg: A) {
+    if(arg::class.java == presenter.argumentClass) {
+      super.setArg(arg)
+    }
+    (router.current as? Screen<*, *, A>?)?.setArg(arg)
+  }
+
   @CallSuper
   override fun resume() {
     super.resume()
@@ -42,10 +49,10 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
   }
 
   @CallSuper
-  override fun onBackPressed(): Boolean = router.handleBack()
+  override fun<A: Any> onBackPressed(arg: A): Boolean = router.handleBack(arg)
 }
 
-open class ContainerPresenter<Self : ContainerPresenter<Self, S, A>, S : ContainerScreen<S, Self, A>, A : Any>(router: Router)
+abstract class ContainerPresenter<Self : ContainerPresenter<Self, S, A>, S : ContainerScreen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var innerRouter: Router
 }
@@ -58,7 +65,7 @@ abstract class InnerScreen<Self : InnerScreen<Self, P, A>, P : InnerPresenter<P,
   }
 }
 
-open class InnerPresenter<Self : InnerPresenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(router: Router)
+abstract class InnerPresenter<Self : InnerPresenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var innerRouter: Router
 }

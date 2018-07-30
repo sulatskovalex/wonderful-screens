@@ -20,16 +20,16 @@ const val PAGER2 = "Pager2"
 const val PAGER3 = "PAGER3"
 
 class MainActivity : ScreensActivity() {
+
   override val router: Router by inject()
-  override val contentId: Int
-    get() = R.layout.activity_main
+  override val contentId: Int = R.layout.activity_main
   override val container: ViewGroup
     get() = mainActivityContainer
-  override val firstScreenTag: String
-    get() = MAIN
+  override val firstScreenTag: String = MAIN
 }
 
 class App : Application() {
+
   override fun onCreate() {
     super.onCreate()
     startKoin(listOf(mainModule))

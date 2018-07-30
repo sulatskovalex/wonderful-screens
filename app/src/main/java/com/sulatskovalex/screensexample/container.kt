@@ -8,8 +8,8 @@ import kotlinx.android.synthetic.main.screen_container.view.*
 import kotlinx.android.synthetic.main.screen_container_first.view.*
 import kotlinx.android.synthetic.main.screen_container_second.view.*
 
-class CScreen(presenter: CPresenter,
-              override val screenTag: String) : ContainerScreen<CScreen, CPresenter, Unit>(presenter) {
+class CScreen(presenter: CPresenter, override val screenTag: String)
+  : ContainerScreen<CScreen, CPresenter, Unit>(presenter) {
   override val firstScreenTag: String = CONTAINER1
 
   override fun createViewWithContainer(inflater: LayoutInflater, parent: ViewGroup): View =
@@ -21,8 +21,8 @@ class CScreen(presenter: CPresenter,
 
 class CPresenter(router: Router) : ContainerPresenter<CPresenter, CScreen, Unit>(router)
 
-class C1Screen(presenter: C1Presenter,
-               override val screenTag: String) : InnerScreen<C1Screen, C1Presenter, Unit>(presenter) {
+class C1Screen(presenter: C1Presenter, override val screenTag: String)
+  : InnerScreen<C1Screen, C1Presenter, Unit>(presenter) {
 
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view = inflater.inflate(R.layout.screen_container_first, parent, false)
@@ -34,6 +34,7 @@ class C1Screen(presenter: C1Presenter,
 }
 
 class C1Presenter(router: Router) : InnerPresenter<C1Presenter, C1Screen, Unit>(router) {
+
   fun onBackClick() {
     router.back()
   }
@@ -43,8 +44,9 @@ class C1Presenter(router: Router) : InnerPresenter<C1Presenter, C1Screen, Unit>(
   }
 }
 
-class C2Screen(presenter: C2Presenter,
-               override val screenTag: String) : InnerScreen<C2Screen, C2Presenter, Unit>(presenter) {
+class C2Screen(presenter: C2Presenter, override val screenTag: String)
+  : InnerScreen<C2Screen, C2Presenter, Unit>(presenter) {
+
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view = inflater.inflate(R.layout.screen_container_second, parent, false)
     view.second_forward.setOnClickListener { presenter.onForwardClick() }
@@ -55,6 +57,7 @@ class C2Screen(presenter: C2Presenter,
 }
 
 class C2Presenter(router: Router) : InnerPresenter<C2Presenter, C2Screen, Unit>(router) {
+
   fun onBackClick() {
     router.back()
   }
