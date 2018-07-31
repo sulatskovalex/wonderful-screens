@@ -1,8 +1,11 @@
 package com.github.sulatskovalex.screens
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.support.annotation.CallSuper
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.experimental.Job
@@ -15,10 +18,13 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
 
   abstract val screenTag: String
   lateinit var view: android.view.View
+    private set
   lateinit var activity: ScreensActivity
   lateinit var inflater: LayoutInflater
+    private set
   var state = Initialized
     private set
+  protected open fun animator(container: ViewGroup, view: View): Animator? = null
 
   fun create(parent: ViewGroup) {
     this.activity = parent.context as ScreensActivity
@@ -33,12 +39,21 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
         (activity.currentFocus ?: view).windowToken, 0)
   }
 
-  open fun attachTo(container: ViewGroup) {
+  open fun attachTo(container: ViewGroup, firstly: Boolean) {
     container.addView(view)
+    if (firstly) {
+      animator(container, view) ?: ValueAnimator.ofFloat(0f, 100f).apply {
+        duration = 1500L
+        addUpdateListener {
+          val animatedValue: Float = it.animatedValue as Float
+          view.alpha = animatedValue
+        }
+      }.start()
+    }
   }
 
   open fun setArg(arg: A) {
-    if(arg::class.java == presenter.argumentClass) {
+    if (arg::class.java == presenter.argumentClass) {
       presenter.argument = arg
     }
   }
@@ -79,7 +94,9 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
 open class Presenter<Self : Presenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(val router: Router) {
   protected val jobs = mutableListOf<Job>()
   lateinit var view: S
+    internal set
   lateinit var argument: A
+    internal set
   open var argumentClass: Class<A> = Any::class.java as Class<A>
 
   open fun onResume() {}

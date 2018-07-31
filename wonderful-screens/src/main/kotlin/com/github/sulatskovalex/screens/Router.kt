@@ -81,8 +81,9 @@ open class Router {
     stack.add(screen)
     screen.create(container)
     (screen as? InnerScreen)?.setInnerRouter(this)
-    activity.permissionsListener = screen as? PermissionsListener
-    activity.activityResultListener = screen as? OnActivityResultListener
+    activity.requestPermissionsResultHandler = screen as? RequestPermissionsResultHandler
+    activity.activityResultHandler = screen as? ActivityResultHandler
+    activity.configurationChangedHandler = screen as? ConfigurationChangedHandler
     screen.setArg(argument)
     screen.create()
     resume(screen)
@@ -115,7 +116,7 @@ open class Router {
     }
     if (screen.state == Screen.Created || screen.state == Screen.Paused) {
       screen.view.removeFromParent()
-      screen.attachTo(container)
+      screen.attachTo(container, screen.state == Screen.Created)
       screen.resume()
     }
   }
