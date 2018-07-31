@@ -39,7 +39,7 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
   }
 
   override fun setArg(arg: A) {
-    if(arg::class.java == presenter.argumentClass) {
+    if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
     adapter.setArg(arg)
@@ -105,6 +105,8 @@ interface PagerRouter {
 open class PagerPresenter<Self : PagerPresenter<Self, S, A>, S : PagerScreen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var pagerRouter: PagerRouter
+    internal set
+
 }
 
 internal class ScreenHolder(val screen: Screen<*, *, *>) : RecyclerView.ViewHolder(screen.view)

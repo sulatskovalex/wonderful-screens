@@ -55,6 +55,7 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
 open class ContainerPresenter<Self : ContainerPresenter<Self, S, A>, S : ContainerScreen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var innerRouter: Router
+  internal set
 }
 
 abstract class InnerScreen<Self : InnerScreen<Self, P, A>, P : InnerPresenter<P, Self, A>, A : Any>(presenter: P)
@@ -68,4 +69,5 @@ abstract class InnerScreen<Self : InnerScreen<Self, P, A>, P : InnerPresenter<P,
 open class InnerPresenter<Self : InnerPresenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(router: Router)
   : Presenter<Self, S, A>(router) {
   lateinit var innerRouter: Router
+    internal set
 }

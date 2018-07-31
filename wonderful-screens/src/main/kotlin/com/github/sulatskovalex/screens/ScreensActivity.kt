@@ -1,6 +1,7 @@
 package com.github.sulatskovalex.screens
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
@@ -12,8 +13,9 @@ abstract class ScreensActivity : AppCompatActivity() {
   abstract val contentId: Int
   abstract val container: ViewGroup
   abstract val firstScreenTag: String
-  var permissionsListener: PermissionsListener? = null
-  var activityResultListener: OnActivityResultListener? = null
+  internal var requestPermissionsResultHandler: RequestPermissionsResultHandler? = null
+  internal var activityResultHandler: ActivityResultHandler? = null
+  internal var configurationChangedHandler: ConfigurationChangedHandler? = null
 
   @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +27,7 @@ abstract class ScreensActivity : AppCompatActivity() {
 
   @CallSuper
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    activityResultListener?.onActivityResult(requestCode, resultCode, data)
+    activityResultHandler?.onActivityResult(requestCode, resultCode, data)
   }
 
   @CallSuper
@@ -54,11 +56,17 @@ abstract class ScreensActivity : AppCompatActivity() {
   @CallSuper
   override fun onRequestPermissionsResult(
       requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-    permissionsListener?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    requestPermissionsResultHandler?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+  }
+
+  @CallSuper
+  override fun onConfigurationChanged(newConfig: Configuration?) {
+    configurationChangedHandler?.onConfigurationChanged(newConfig)
+    super.onConfigurationChanged(newConfig)
   }
 }
 
-interface PermissionsListener {
+interface RequestPermissionsResultHandler {
   fun onRequestPermissionsResult(reqCode: Int, permissions: Array<String>, result: IntArray)
 }
 
@@ -66,6 +74,10 @@ interface BackPressedHandler {
   fun <A : Any> onBackPressed(arg: A): Boolean
 }
 
-interface OnActivityResultListener {
+interface ActivityResultHandler {
   fun onActivityResult(reqCode: Int, resCode: Int, data: Intent?)
+}
+
+interface ConfigurationChangedHandler {
+  fun onConfigurationChanged(newConfig: Configuration?)
 }
