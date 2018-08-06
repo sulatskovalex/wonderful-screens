@@ -13,6 +13,7 @@ abstract class ScreensActivity : AppCompatActivity() {
   abstract val contentId: Int
   abstract val container: ViewGroup
   abstract val firstScreenTag: String
+  protected open val firstScreenArg: Any = Unit
   internal var requestPermissionsResultHandler: RequestPermissionsResultHandler? = null
   internal var activityResultHandler: ActivityResultHandler? = null
   internal var configurationChangedHandler: ConfigurationChangedHandler? = null
@@ -81,3 +82,7 @@ interface ActivityResultHandler {
 interface ConfigurationChangedHandler {
   fun onConfigurationChanged(newConfig: Configuration?)
 }
+
+inline fun org.koin.dsl.context.Context.screen(tag: String, crossinline sc: () -> Screen<*, *, *>) = factory(tag) { sc.invoke() }
+
+inline fun <reified T : Presenter<*, *, *>> org.koin.dsl.context.Context.presenter(crossinline presenter: () -> T) = factory { presenter.invoke() }

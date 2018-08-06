@@ -5,9 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : ContainerPresenter<P, Self, A>, A : Any>(
-    presenter: P)
-  : Screen<Self, P, A>(presenter), BackPressedHandler {
+abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : Presenter<P, S, A>, A : Any>(presenter: P)
+  : Screen<S, P, A>(presenter), BackPressedHandler {
   abstract val firstScreenTag: String
   private val router = Router()
 
@@ -19,12 +18,11 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
     val view = createViewWithContainer(inflater, parent)
     router.attachToContainer(container(view))
     router.setRoot(firstScreenTag)
-    presenter.innerRouter = router
     return view
   }
 
   override fun setArg(arg: A) {
-    if(arg::class.java == presenter.argumentClass) {
+    if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
     (router.current as? Screen<*, *, A>?)?.setArg(arg)
@@ -49,25 +47,28 @@ abstract class ContainerScreen<Self : ContainerScreen<Self, P, A>, P : Container
   }
 
   @CallSuper
-  override fun<A: Any> onBackPressed(arg: A): Boolean = router.handleBack(arg)
+  override fun <A : Any> onBackPressed(arg: A): Boolean = router.handleBack(arg)
 }
 
-open class ContainerPresenter<Self : ContainerPresenter<Self, S, A>, S : ContainerScreen<S, Self, A>, A : Any>(router: Router)
-  : Presenter<Self, S, A>(router) {
-  lateinit var innerRouter: Router
-  internal set
-}
 
-abstract class InnerScreen<Self : InnerScreen<Self, P, A>, P : InnerPresenter<P, Self, A>, A : Any>(presenter: P)
-  : Screen<Self, P, A>(presenter) {
+abstract class InnerContainerScreen<S : InnerContainerScreen<S, P, A>, P : InnerPresenter<P, S, A>, A : Any>(presenter: P)
+  : ContainerScreen<S, P, A>(presenter) {
 
-  fun setInnerRouter(router: Router) {
-    presenter.innerRouter = router
+  internal fun setInnerRouter(innerRouter: Router) {
+    presenter.innerRouter = innerRouter
   }
 }
 
-open class InnerPresenter<Self : InnerPresenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(router: Router)
-  : Presenter<Self, S, A>(router) {
+abstract class InnerScreen<S : InnerScreen<S, P, A>, P : InnerPresenter<P, S, A>, A : Any>(presenter: P)
+  : Screen<S, P, A>(presenter) {
+
+  internal fun setInnerRouter(innerRouter: Router) {
+    presenter.innerRouter = innerRouter
+  }
+}
+
+open class InnerPresenter<P : InnerPresenter<P, S, A>, S : Screen<S, P, A>, A : Any>(router: Router)
+  : Presenter<P, S, A>(router) {
   lateinit var innerRouter: Router
     internal set
 }
