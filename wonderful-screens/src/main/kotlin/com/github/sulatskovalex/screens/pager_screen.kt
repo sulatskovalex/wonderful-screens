@@ -14,8 +14,8 @@ import com.github.sulatskovalex.screens.Screen.Companion.Resumed
 import org.koin.KoinContext
 import org.koin.standalone.StandAloneContext
 
-abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P, Self, A>, A : Any>(presenter: P)
-  : Screen<Self, P, A>(presenter), BackPressedHandler, PagerRouter {
+abstract class PagerScreen<S: PagerScreen<S, P, A>, P : PagerPresenter<P, S, A>, A : Any>(presenter: P)
+  : Screen<S, P, A>(presenter), BackPressedHandler, PagerRouter {
 
   abstract val screenTags: Array<String>
   abstract val firstScreenTag: String
@@ -62,7 +62,7 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
   }
 
   @CallSuper
-  override fun <A: Any> onBackPressed(arg: A): Boolean {
+  override fun <A : Any> onBackPressed(arg: A): Boolean {
     return adapter.handleBack(arg)
   }
 
@@ -89,6 +89,10 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
     openTab(tag, Unit)
   }
 
+  override fun <A : Any> setArgTo(tag: String, arg: A) {
+    adapter.setArgTo(tag, arg)
+  }
+
   @CallSuper
   override fun <A : Any> openTab(tag: String, arg: A) {
     val indexOf = adapter.getIndexOf(tag)
@@ -97,28 +101,39 @@ abstract class PagerScreen<Self : PagerScreen<Self, P, A>, P : PagerPresenter<P,
   }
 }
 
-interface PagerRouter {
+internal interface PagerRouter {
   fun <A : Any> openTab(tag: String, arg: A)
   fun openTab(tag: String)
+  fun <A : Any> setArgTo(tag: String, arg: A)
 }
 
-open class PagerPresenter<Self : PagerPresenter<Self, S, A>, S : PagerScreen<S, Self, A>, A : Any>(router: Router)
-  : Presenter<Self, S, A>(router) {
-  lateinit var pagerRouter: PagerRouter
-    internal set
+open class PagerPresenter<P: PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>, A : Any>(router: Router)
+  : Presenter<P, S, A>(router), PagerRouter {
+
+  internal lateinit var pagerRouter: PagerRouter
+
+  override fun openTab(tag: String) {
+    pagerRouter.openTab(tag)
+  }
+
+  override fun <A : Any> openTab(tag: String, arg: A) {
+    pagerRouter.openTab(tag, arg)
+  }
+
+  override fun <A : Any> setArgTo(tag: String, arg: A) {
+    pagerRouter.setArgTo(tag, arg)
+  }
 
 }
 
 internal class ScreenHolder(val screen: Screen<*, *, *>) : RecyclerView.ViewHolder(screen.view)
 
 internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<ScreenHolder>() {
-  private val screens =
-      List(
-          tags.size,
-          { index ->
-            val screen: Screen<*, *, *> = (StandAloneContext.koinContext as KoinContext).get(tags[index])
-            screen
-          })
+  private val screens: List<Screen<*, *, *>> =
+      List(tags.size) { index ->
+        val screen: Screen<*, *, *> = (StandAloneContext.koinContext as KoinContext).get(tags[index])
+        screen
+      }
 
   private var current: Screen<*, *, *>? = null
 
@@ -146,7 +161,7 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
     }
   }
 
-  fun <A: Any> handleBack(arg: A): Boolean {
+  fun <A : Any> handleBack(arg: A): Boolean {
     val current = this.current
     return current != null && current is BackPressedHandler && current.onBackPressed(arg)
   }
@@ -190,7 +205,11 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
     throw Throwable("screen with tag $tag is not exist in pager")
   }
 
-  fun <A: Any> setArg(arg: A) {
+  fun <A : Any> setArg(arg: A) {
     (current as? Screen<*, *, A>?)?.setArg(arg)
+  }
+
+  fun <A : Any> setArgTo(tag: String, arg: A) {
+    (screens[getIndexOf(tag)] as? Screen<*, *, A>)?.setArg(arg)
   }
 }

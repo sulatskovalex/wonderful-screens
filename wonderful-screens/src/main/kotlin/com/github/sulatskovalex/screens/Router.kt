@@ -65,7 +65,7 @@ open class Router {
     }
   }
 
-  fun <A: Any> back(arg: A) {
+  fun <A : Any> back(arg: A) {
     activity.onBackPressed(arg)
   }
 
@@ -76,11 +76,15 @@ open class Router {
   private fun <A : Any> replace(tag: String, argument: A, destroy: Boolean) {
     if (!stack.isEmpty()) {
       pause(current, destroy)
+      if (!destroy && stack.size > 2) {
+        stack[stack.size - 2].view.removeFromParent()
+      }
     }
     val screen: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
     stack.add(screen)
     screen.create(container)
     (screen as? InnerScreen)?.setInnerRouter(this)
+    (screen as? InnerContainerScreen)?.setInnerRouter(this)
     activity.requestPermissionsResultHandler = screen as? RequestPermissionsResultHandler
     activity.activityResultHandler = screen as? ActivityResultHandler
     activity.configurationChangedHandler = screen as? ConfigurationChangedHandler
@@ -93,7 +97,7 @@ open class Router {
     return handleBack(Unit)
   }
 
-  fun<A: Any> handleBack(arg: A): Boolean {
+  fun <A : Any> handleBack(arg: A): Boolean {
     if (!stack.isEmpty()) {
       val current = current
       if (current is BackPressedHandler) {

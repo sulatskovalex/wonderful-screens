@@ -1,7 +1,5 @@
 package com.github.sulatskovalex.screens
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.support.annotation.CallSuper
 import android.view.LayoutInflater
@@ -20,11 +18,10 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   lateinit var view: android.view.View
     private set
   lateinit var activity: ScreensActivity
-  lateinit var inflater: LayoutInflater
+  protected lateinit var inflater: LayoutInflater
     private set
-  var state = Initialized
+  internal var state = Initialized
     private set
-  protected open fun animator(container: ViewGroup, view: View): Animator? = null
 
   fun create(parent: ViewGroup) {
     this.activity = parent.context as ScreensActivity
@@ -42,14 +39,12 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   open fun attachTo(container: ViewGroup, firstly: Boolean) {
     container.addView(view)
     if (firstly) {
-      animator(container, view) ?: ValueAnimator.ofFloat(0f, 100f).apply {
-        duration = 1500L
-        addUpdateListener {
-          val animatedValue: Float = it.animatedValue as Float
-          view.alpha = animatedValue
-        }
-      }.start()
+      onViewAdded(view)
     }
+  }
+
+  protected open fun onViewAdded(view: View) {
+
   }
 
   open fun setArg(arg: A) {
