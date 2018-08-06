@@ -19,7 +19,7 @@ class CScreen(presenter: CPresenter, override val screenTag: String)
 
 }
 
-class CPresenter(router: Router) : ContainerPresenter<CPresenter, CScreen, Unit>(router)
+class CPresenter(router: Router) : Presenter<CPresenter, CScreen, Unit>(router)
 
 class C1Screen(presenter: C1Presenter, override val screenTag: String)
   : InnerScreen<C1Screen, C1Presenter, Unit>(presenter) {

@@ -3,8 +3,9 @@ package com.sulatskovalex.screensexample
 import android.app.Application
 import android.view.ViewGroup
 import com.github.sulatskovalex.screens.Router
-import com.github.sulatskovalex.screens.Screen
 import com.github.sulatskovalex.screens.ScreensActivity
+import com.github.sulatskovalex.screens.presenter
+import com.github.sulatskovalex.screens.screen
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
@@ -39,28 +40,28 @@ class App : Application() {
 val mainModule = applicationContext {
   bean { Router() }
 
-  factory(MAIN) { MainScreen(get(), MAIN) as Screen<*, *, *> }
-  factory { MainPresenter(get()) }
+  screen(MAIN) { MainScreen(get(), MAIN) }
+  presenter { MainPresenter(get()) }
 
-  factory(CONTAINER) { CScreen(get(), CONTAINER) as Screen<*, *, *> }
-  factory { CPresenter(get()) }
+  screen(CONTAINER) { CScreen(get(), CONTAINER) }
+  presenter { CPresenter(get()) }
 
-  factory(CONTAINER1) { C1Screen(get(), CONTAINER1) as Screen<*, *, *> }
-  factory { C1Presenter(get()) }
+  screen(CONTAINER1) { C1Screen(get(), CONTAINER1) }
+  presenter { C1Presenter(get()) }
 
-  factory(CONTAINER2) { C2Screen(get(), CONTAINER2) as Screen<*, *, *> }
-  factory { C2Presenter(get()) }
+  screen(CONTAINER2) { C2Screen(get(), CONTAINER2) }
+  presenter { C2Presenter(get()) }
 
-  factory(PAGER) { PagScreen(get(), PAGER) as Screen<*, *, *> }
-  factory { PagPresenter(get()) }
+  screen(PAGER) { PagScreen(get(), PAGER) }
+  presenter { PagPresenter(get()) }
 
-  factory(PAGER1) { P1Screen(get(), PAGER1) as Screen<*, *, *> }
-  factory { P1Presenter(get()) }
+  screen(PAGER1) { P1Screen(get(), PAGER1) }
+  presenter { P1Presenter(get()) }
 
-  factory(PAGER2) { P2Screen(get(), PAGER2) as Screen<*, *, *> }
-  factory { P2Presenter(get()) }
+  screen(PAGER2) { P2Screen(get(), PAGER2) }
+  presenter { P2Presenter(get()) }
 
-  factory(PAGER3) { P3Screen(get(), PAGER3) as Screen<*, *, *> }
-  factory { P3Presenter(get()) }
+  screen(PAGER3) { P3Screen(get(), PAGER3) }
+  presenter { P3Presenter(get()) }
 
 }

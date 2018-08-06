@@ -1,5 +1,6 @@
 package com.sulatskovalex.screensexample
 
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,20 +20,24 @@ class PagScreen(presenter: PagPresenter, override val screenTag: String)
     view.third_page.setOnClickListener { presenter.onThirdPageClick() }
     return view
   }
+
+  override fun recycler(createdView: View): RecyclerView {
+    return createdView.findViewById(R.id.pager_list)
+  }
 }
 
 class PagPresenter(router: Router) : PagerPresenter<PagPresenter, PagScreen, Unit>(router) {
 
   fun onFirstPageClick() {
-    pagerRouter.openTab(PAGER1)
+    openTab(PAGER1)
   }
 
   fun onSecondPageClick() {
-    pagerRouter.openTab(PAGER2)
+    openTab(PAGER2)
   }
 
   fun onThirdPageClick() {
-    pagerRouter.openTab(PAGER3)
+    openTab(PAGER3)
   }
 }
 
