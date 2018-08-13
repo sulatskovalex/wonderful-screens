@@ -31,7 +31,7 @@ abstract class PagerScreen<S: PagerScreen<S, P, A>, P : PagerPresenter<P, S, A>,
     layoutManager = createLayoutManager(parent)
     recyclerView.layoutManager = layoutManager
     PagerSnapHelper().attachToRecyclerView(recyclerView)
-    adapter = ScreensAdapter(screenTags)
+    adapter = ScreensAdapter(presenter, screenTags)
     recyclerView.adapter = adapter
     recyclerView.scrollToPosition(screenTags.indexOf(firstScreenTag))
     presenter.pagerRouter = this
@@ -124,11 +124,19 @@ open class PagerPresenter<P: PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>, 
     pagerRouter.setArgTo(tag, arg)
   }
 
+  open fun onScreenResumed(position: Int, screen: Screen<*, *, *>) {
+
+  }
+
+  open fun onScreenPaused(position: Int, screen: Screen<*, *, *>) {
+
+  }
+
 }
 
 internal class ScreenHolder(val screen: Screen<*, *, *>) : RecyclerView.ViewHolder(screen.view)
 
-internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<ScreenHolder>() {
+internal class ScreensAdapter(val pagerPresenter: PagerPresenter<*,*,*>, tags: Array<String>) : RecyclerView.Adapter<ScreenHolder>() {
   private val screens: List<Screen<*, *, *>> =
       List(tags.size) { index ->
         val screen: Screen<*, *, *> = (StandAloneContext.koinContext as KoinContext).get(tags[index])
@@ -150,6 +158,7 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
     val screen = holder.screen
     current = screen
     if (screen.state == Created || screen.state == Paused) {
+      pagerPresenter.onScreenResumed(getIndexOf(screen.screenTag), screen)
       screen.resume()
     }
   }
@@ -157,6 +166,7 @@ internal class ScreensAdapter(tags: Array<String>) : RecyclerView.Adapter<Screen
   override fun onViewDetachedFromWindow(holder: ScreenHolder) {
     val screen = holder.screen
     if (screen.state == Resumed) {
+      pagerPresenter.onScreenPaused(getIndexOf(screen.screenTag), screen)
       screen.pause()
     }
   }

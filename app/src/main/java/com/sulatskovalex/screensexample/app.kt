@@ -6,19 +6,40 @@ import com.github.sulatskovalex.screens.Router
 import com.github.sulatskovalex.screens.ScreensActivity
 import com.github.sulatskovalex.screens.presenter
 import com.github.sulatskovalex.screens.screen
+import com.sulatskovalex.screensexample.container.MainContainerPresenter
+import com.sulatskovalex.screensexample.container.MainContainerScreen
+import com.sulatskovalex.screensexample.container.screens.first.ContainerFirstPresenter
+import com.sulatskovalex.screensexample.container.screens.first.ContainerFirstScreen
+import com.sulatskovalex.screensexample.container.screens.second.ContainerSecondPresenter
+import com.sulatskovalex.screensexample.container.screens.second.ContainerSecondScreen
+import com.sulatskovalex.screensexample.pager.MainPagerPresenter
+import com.sulatskovalex.screensexample.pager.MainPagerScreen
+import com.sulatskovalex.screensexample.pager.screens.first.PageFirstPresenter
+import com.sulatskovalex.screensexample.pager.screens.first.PageFirstScreen
+import com.sulatskovalex.screensexample.pager.screens.second.PageSecondPresenter
+import com.sulatskovalex.screensexample.pager.screens.second.PageSecondScreen
+import com.sulatskovalex.screensexample.pager.screens.third.PageThirdPresenter
+import com.sulatskovalex.screensexample.pager.screens.third.PageThirdScreen
+import com.sulatskovalex.screensexample.start_main.MainPresenter
+import com.sulatskovalex.screensexample.start_main.MainScreen
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.applicationContext
 
-const val MAIN = "MAIN"
-const val CONTAINER = "CONTAINER"
-const val CONTAINER1 = "CONTAINER1"
-const val CONTAINER2 = "CONTAINER2"
-const val PAGER = "PAGER"
-const val PAGER1 = "Pager1"
-const val PAGER2 = "Pager2"
-const val PAGER3 = "PAGER3"
+// main
+const val MAIN_SCREEN = "MAIN_SCREEN"
+
+// container
+const val CONTAINER_SCREEN_MAIN = "CONTAINER_SCREEN_MAIN"
+const val CONTAINER_SCREEN_FIRST = "CONTAINER_SCREEN_FIRST"
+const val CONTAINER_SCREEN_SECOND = "CONTAINER_SCREEN_SECOND"
+
+// viewpager
+const val PAGER_SCREEN_MAIN = "PAGER_SCREEN_MAIN"
+const val PAGE_SCREEN_FIRST = "PAGE_SCREEN_FIRST"
+const val PAGE_SCREEN_SECOND = "PAGE_SCREEN_SECOND"
+const val PAGE_SCREEN_THIRD = "PAGE_SCREEN_THIRD"
 
 class MainActivity : ScreensActivity() {
 
@@ -26,42 +47,50 @@ class MainActivity : ScreensActivity() {
   override val contentId: Int = R.layout.activity_main
   override val container: ViewGroup
     get() = mainActivityContainer
-  override val firstScreenTag: String = MAIN
+  override val firstScreenTag: String = MAIN_SCREEN
 }
 
 class App : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    // start Koin!
     startKoin(listOf(mainModule))
   }
 }
 
+// just declare it
 val mainModule = applicationContext {
   bean { Router() }
 
-  screen(MAIN) { MainScreen(get(), MAIN) }
+  screen(MAIN_SCREEN) { MainScreen(get(), MAIN_SCREEN) }
   presenter { MainPresenter(get()) }
 
-  screen(CONTAINER) { CScreen(get(), CONTAINER) }
-  presenter { CPresenter(get()) }
+  /**
+   * Container
+   */
+  screen(CONTAINER_SCREEN_MAIN) { MainContainerScreen(get(), CONTAINER_SCREEN_MAIN) }
+  presenter { MainContainerPresenter(get()) }
 
-  screen(CONTAINER1) { C1Screen(get(), CONTAINER1) }
-  presenter { C1Presenter(get()) }
+  screen(CONTAINER_SCREEN_FIRST) { ContainerFirstScreen(get(), CONTAINER_SCREEN_FIRST) }
+  presenter { ContainerFirstPresenter(get()) }
 
-  screen(CONTAINER2) { C2Screen(get(), CONTAINER2) }
-  presenter { C2Presenter(get()) }
+  screen(CONTAINER_SCREEN_SECOND) { ContainerSecondScreen(get(), CONTAINER_SCREEN_SECOND) }
+  presenter { ContainerSecondPresenter(get()) }
 
-  screen(PAGER) { PagScreen(get(), PAGER) }
-  presenter { PagPresenter(get()) }
+  /**
+   * ViewPager
+   */
+  screen(PAGER_SCREEN_MAIN) { MainPagerScreen(get(), PAGER_SCREEN_MAIN) }
+  presenter { MainPagerPresenter(get()) }
 
-  screen(PAGER1) { P1Screen(get(), PAGER1) }
-  presenter { P1Presenter(get()) }
+  screen(PAGE_SCREEN_FIRST) { PageFirstScreen(get(), PAGE_SCREEN_FIRST) }
+  presenter { PageFirstPresenter(get()) }
 
-  screen(PAGER2) { P2Screen(get(), PAGER2) }
-  presenter { P2Presenter(get()) }
+  screen(PAGE_SCREEN_SECOND) { PageSecondScreen(get(), PAGE_SCREEN_SECOND) }
+  presenter { PageSecondPresenter(get()) }
 
-  screen(PAGER3) { P3Screen(get(), PAGER3) }
-  presenter { P3Presenter(get()) }
+  screen(PAGE_SCREEN_THIRD) { PageThirdScreen(get(), PAGE_SCREEN_THIRD) }
+  presenter { PageThirdPresenter(get()) }
 
 }
