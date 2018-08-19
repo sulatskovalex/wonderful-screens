@@ -39,6 +39,7 @@ abstract class PagerScreen<S: PagerScreen<S, P, A>, P : PagerPresenter<P, S, A>,
   }
 
   override fun setArg(arg: A) {
+    if (arg == null) return
     if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
@@ -136,7 +137,8 @@ open class PagerPresenter<P: PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>, 
 
 internal class ScreenHolder(val screen: Screen<*, *, *>) : RecyclerView.ViewHolder(screen.view)
 
-internal class ScreensAdapter(val pagerPresenter: PagerPresenter<*,*,*>, tags: Array<String>) : RecyclerView.Adapter<ScreenHolder>() {
+internal class ScreensAdapter(private val pagerPresenter: PagerPresenter<*,*,*>, tags: Array<String>)
+  : RecyclerView.Adapter<ScreenHolder>() {
   private val screens: List<Screen<*, *, *>> =
       List(tags.size) { index ->
         val screen: Screen<*, *, *> = (StandAloneContext.koinContext as KoinContext).get(tags[index])

@@ -5,7 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : Presenter<P, S, A>, A : Any>(presenter: P)
+abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : ContainerPresenter<P, S, A>, A : Any>(
+    presenter: P)
   : Screen<S, P, A>(presenter), BackPressedHandler {
   abstract val firstScreenTag: String
   private val router = Router()
@@ -18,10 +19,12 @@ abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : Presenter<P, S,
     val view = createViewWithContainer(inflater, parent)
     router.attachToContainer(container(view))
     router.setRoot(firstScreenTag)
+    presenter.chlidRouter = router
     return view
   }
 
   override fun setArg(arg: A) {
+    if (arg == null) return
     if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
@@ -51,24 +54,21 @@ abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : Presenter<P, S,
 }
 
 
-abstract class InnerContainerScreen<S : InnerContainerScreen<S, P, A>, P : InnerPresenter<P, S, A>, A : Any>(presenter: P)
-  : ContainerScreen<S, P, A>(presenter) {
-
-  internal fun setInnerRouter(innerRouter: Router) {
-    presenter.innerRouter = innerRouter
-  }
-}
-
-abstract class InnerScreen<S : InnerScreen<S, P, A>, P : InnerPresenter<P, S, A>, A : Any>(presenter: P)
-  : Screen<S, P, A>(presenter) {
-
-  internal fun setInnerRouter(innerRouter: Router) {
-    presenter.innerRouter = innerRouter
-  }
-}
-
-open class InnerPresenter<P : InnerPresenter<P, S, A>, S : Screen<S, P, A>, A : Any>(router: Router)
+open class ContainerPresenter<P : ContainerPresenter<P, S, A>, S : ContainerScreen<S, P, A>, A : Any>(router: Router)
   : Presenter<P, S, A>(router) {
-  lateinit var innerRouter: Router
+  lateinit var chlidRouter: Router
     internal set
+}
+
+open class ChildPresenter<P : ChildPresenter<P, S, A>, S : ChildScreen<S, P, A>, A : Any>(router: Router)
+  : Presenter<P, S, A>(router) {
+  lateinit var chlidRouter: Router
+    internal set
+}
+
+abstract class ChildScreen<S : ChildScreen<S, P, A>, P : ChildPresenter<P, S, A>, A : Any>(presenter: P)
+  : Screen<S, P, A>(presenter) {
+  internal fun setChildRouter(childRouter: Router) {
+    presenter.chlidRouter = childRouter
+  }
 }
