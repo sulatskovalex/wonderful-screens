@@ -10,7 +10,7 @@ Project `build.gradle`
 
 ```
 buildscript {
-  ext.screens_version: '0.0.6'
+  ext.screens_version: '0.1'
 }
 
 allprojects {
