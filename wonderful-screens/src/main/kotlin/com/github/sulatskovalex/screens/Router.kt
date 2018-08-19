@@ -83,8 +83,7 @@ open class Router {
     val screen: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
     stack.add(screen)
     screen.create(container)
-    (screen as? InnerScreen)?.setInnerRouter(this)
-    (screen as? InnerContainerScreen)?.setInnerRouter(this)
+    (screen as? ChildScreen)?.setChildRouter(this)
     activity.requestPermissionsResultHandler = screen as? RequestPermissionsResultHandler
     activity.activityResultHandler = screen as? ActivityResultHandler
     activity.configurationChangedHandler = screen as? ConfigurationChangedHandler
