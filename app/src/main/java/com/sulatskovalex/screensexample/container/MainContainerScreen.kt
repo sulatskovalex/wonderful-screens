@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.screen_container.view.*
 
 class MainContainerScreen(presenter: MainContainerPresenter, override val screenTag: String)
   : ContainerScreen<MainContainerScreen, MainContainerPresenter, Unit>(presenter) {
+  override val firstScreenArg = Any()
   override val firstScreenTag: String = CONTAINER_SCREEN_FIRST
 
   override fun createViewWithContainer(inflater: LayoutInflater, parent: ViewGroup): View =

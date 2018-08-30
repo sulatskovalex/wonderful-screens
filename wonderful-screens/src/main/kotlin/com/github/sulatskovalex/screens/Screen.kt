@@ -2,16 +2,17 @@ package com.github.sulatskovalex.screens
 
 import android.content.Context
 import android.support.annotation.CallSuper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.experimental.Job
 
-abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : Any>(protected val presenter: P) {
+abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(protected val presenter: P) {
 
   init {
-    presenter.view = this as Self
+    presenter.screen = this as S
   }
 
   abstract val screenTag: String
@@ -50,13 +51,13 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   }
 
   internal open fun setArg(arg: A) {
-    if (arg == null) return
     if (arg::class.java == presenter.argumentClass) {
       presenter.argument = arg
     }
   }
 
   internal open fun create() {
+    Log.e(javaClass.simpleName," create")
     state = Created
     onCreate()
     presenter.onCreate()
@@ -65,6 +66,7 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   protected open fun onCreate() { }
 
   internal open fun resume() {
+    Log.e(javaClass.simpleName," resume")
     state = Resumed
     onResume()
     presenter.onResume()
@@ -73,6 +75,7 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   protected open fun onResume() { }
 
   internal open fun pause() {
+    Log.e(javaClass.simpleName," pause")
     state = Paused
     onPause()
     presenter.onPause()
@@ -81,6 +84,7 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   protected open fun onPause() { }
 
   internal open fun destroy() {
+    Log.e(javaClass.simpleName,  " destroy")
     state = Destroyed
     onDestroy()
     presenter.onDestroy()
@@ -97,9 +101,9 @@ abstract class Screen<Self : Screen<Self, P, A>, P : Presenter<P, Self, A>, A : 
   }
 }
 
-open class Presenter<Self : Presenter<Self, S, A>, S : Screen<S, Self, A>, A : Any>(val rootRouter: Router) {
+open class Presenter<P : Presenter<P, S, A>, S : Screen<S, P, A>, A : Any>(val rootRouter: Router) {
   protected val jobs = mutableListOf<Job>()
-  lateinit var view: S
+  lateinit var screen: S
     internal set
   lateinit var argument: A
     internal set

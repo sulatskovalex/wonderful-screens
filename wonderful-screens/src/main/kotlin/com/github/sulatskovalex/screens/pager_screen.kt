@@ -1,91 +1,85 @@
 package com.github.sulatskovalex.screens
 
 import android.support.annotation.CallSuper
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.PagerSnapHelper
-import android.support.v7.widget.RecyclerView
+import android.support.v4.view.PagerAdapter
+import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.sulatskovalex.screens.Screen.Companion.Created
-import com.github.sulatskovalex.screens.Screen.Companion.Initialized
 import com.github.sulatskovalex.screens.Screen.Companion.Paused
 import com.github.sulatskovalex.screens.Screen.Companion.Resumed
 import org.koin.KoinContext
 import org.koin.standalone.StandAloneContext
 
-abstract class PagerScreen<S: PagerScreen<S, P, A>, P : PagerPresenter<P, S, A>, A : Any>(presenter: P)
+abstract class PagerScreen<
+    S : PagerScreen<S, P, A>,
+    P : PagerPresenter<P, S, A>,
+    A : Any>(presenter: P)
   : Screen<S, P, A>(presenter), BackPressedHandler, PagerRouter {
 
   abstract val screenTags: Array<String>
   abstract val firstScreenTag: String
+  abstract val firstScreenArg: Any
   abstract val canScrollHorizontally: Boolean
   private lateinit var adapter: ScreensAdapter
-  private lateinit var layoutManager: RecyclerView.LayoutManager
-  private lateinit var recyclerView: RecyclerView
+  private lateinit var viewPager: ViewPager
 
   final override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
-    val view = createViewWithRecycler(inflater, parent)
-    recyclerView = recycler(view)
-    recyclerView.setItemViewCacheSize(screenTags.size)
-    layoutManager = createLayoutManager(parent)
-    recyclerView.layoutManager = layoutManager
-    PagerSnapHelper().attachToRecyclerView(recyclerView)
-    adapter = ScreensAdapter(presenter, screenTags)
-    recyclerView.adapter = adapter
-    recyclerView.scrollToPosition(screenTags.indexOf(firstScreenTag))
+    val view = createViewWithPager(inflater, parent)
+    viewPager = pager(view)
+    adapter = ScreensAdapter(screenTags, presenter) {
+      viewPager.currentItem
+    }
+    viewPager.adapter = adapter
+    viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+      override fun onPageScrollStateChanged(state: Int) {}
+
+      override fun onPageScrolled(position: Int, positionOffset: Float, offsetPixels: Int) {}
+
+      override fun onPageSelected(position: Int) {
+        adapter.onPageSelected(position)
+      }
+
+    })
+    adapter.setArgTo(firstScreenTag, firstScreenArg)
+    viewPager.currentItem = screenTags.indexOf(firstScreenTag)
     presenter.pagerRouter = this
     return view
   }
 
   override fun setArg(arg: A) {
-    if (arg == null) return
     if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
     adapter.setArg(arg)
   }
 
-  protected open fun createViewWithRecycler(inflater: LayoutInflater, parent: ViewGroup): View =
-      RecyclerView(activity)
+  protected open fun createViewWithPager(inflater: LayoutInflater,
+                                         parent: ViewGroup): View = ViewPager(activity)
 
-  protected open fun recycler(createdView: View): RecyclerView {
-    return createdView as RecyclerView
-  }
-
-  protected open fun createLayoutManager(parent: ViewGroup): RecyclerView.LayoutManager {
-    return object : LinearLayoutManager(
-        parent.context, LinearLayoutManager.HORIZONTAL, false) {
-      override fun canScrollHorizontally(): Boolean {
-        return super.canScrollHorizontally() && canScrollHorizontally
-      }
-    }
-  }
+  protected open fun pager(createdView: View): ViewPager = createdView as ViewPager
 
   @CallSuper
   override fun <A : Any> onBackPressed(arg: A): Boolean {
     return adapter.handleBack(arg)
   }
 
-  @CallSuper
   override fun pause() {
     super.pause()
     adapter.pause()
   }
 
-  @CallSuper
   override fun resume() {
     super.resume()
     adapter.resume()
   }
 
-  @CallSuper
   override fun destroy() {
     super.destroy()
     adapter.destroy()
   }
 
-  @CallSuper
   override fun openTab(tag: String) {
     openTab(tag, Unit)
   }
@@ -96,93 +90,76 @@ abstract class PagerScreen<S: PagerScreen<S, P, A>, P : PagerPresenter<P, S, A>,
 
   @CallSuper
   override fun <A : Any> openTab(tag: String, arg: A) {
-    val indexOf = adapter.getIndexOf(tag)
-    adapter.scrollTo(indexOf, arg)
-    layoutManager.scrollToPosition(indexOf)
+    val position = adapter.getIndexOf(tag)
+    adapter.setArgTo(position, arg)
+    viewPager.currentItem = position
   }
 }
 
-internal interface PagerRouter {
+interface PagerRouter {
   fun <A : Any> openTab(tag: String, arg: A)
   fun openTab(tag: String)
   fun <A : Any> setArgTo(tag: String, arg: A)
 }
 
-open class PagerPresenter<P: PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>, A : Any>(router: Router)
-  : Presenter<P, S, A>(router), PagerRouter {
+open class PagerPresenter<P : PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>, A : Any>(router: Router)
+  : Presenter<P, S, A>(router) {
 
-  internal lateinit var pagerRouter: PagerRouter
+  lateinit var pagerRouter: PagerRouter
+    internal set
 
-  override fun openTab(tag: String) {
-    pagerRouter.openTab(tag)
-  }
-
-  override fun <A : Any> openTab(tag: String, arg: A) {
-    pagerRouter.openTab(tag, arg)
-  }
-
-  override fun <A : Any> setArgTo(tag: String, arg: A) {
-    pagerRouter.setArgTo(tag, arg)
-  }
-
-  open fun onScreenResumed(position: Int, screen: Screen<*, *, *>) {
+  open fun onScreenResumed(position: Int, screen: Screen<*, *, *>?) {
 
   }
 
-  open fun onScreenPaused(position: Int, screen: Screen<*, *, *>) {
+  open fun onScreenPaused(position: Int, screen: Screen<*, *, *>?) {
 
   }
 
 }
 
-internal class ScreenHolder(val screen: Screen<*, *, *>) : RecyclerView.ViewHolder(screen.view)
+internal class ScreensAdapter(
+    tags: Array<String>,
+    private val presenter: PagerPresenter<*, *, *>,
+    private val currentPositionProvider: () -> Int)
+  : PagerAdapter() {
 
-internal class ScreensAdapter(private val pagerPresenter: PagerPresenter<*,*,*>, tags: Array<String>)
-  : RecyclerView.Adapter<ScreenHolder>() {
+  override fun isViewFromObject(view: View, obj: Any): Boolean = view == obj
+
   private val screens: List<Screen<*, *, *>> =
       List(tags.size) { index ->
         val screen: Screen<*, *, *> = (StandAloneContext.koinContext as KoinContext).get(tags[index])
         screen
       }
 
+  var currentPosition: Int = 0
   private var current: Screen<*, *, *>? = null
-
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScreenHolder {
-    val screen = screens[viewType]
-    if (screen.state == Initialized) {
-      screen.create(parent)
-      screen.create()
-    }
-    return ScreenHolder(screen)
-  }
-
-  override fun onViewAttachedToWindow(holder: ScreenHolder) {
-    val screen = holder.screen
-    current = screen
-    if (screen.state == Created || screen.state == Paused) {
-      pagerPresenter.onScreenResumed(getIndexOf(screen.screenTag), screen)
-      screen.resume()
-    }
-  }
-
-  override fun onViewDetachedFromWindow(holder: ScreenHolder) {
-    val screen = holder.screen
-    if (screen.state == Resumed) {
-      pagerPresenter.onScreenPaused(getIndexOf(screen.screenTag), screen)
-      screen.pause()
-    }
-  }
 
   fun <A : Any> handleBack(arg: A): Boolean {
     val current = this.current
     return current != null && current is BackPressedHandler && current.onBackPressed(arg)
   }
 
-  override fun onBindViewHolder(holder: ScreenHolder, position: Int) {}
+  override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
+    container.removeView(screens[position].view)
+  }
 
-  override fun getItemViewType(position: Int): Int = position
+  override fun instantiateItem(container: ViewGroup, position: Int): Any {
+    val screen = screens[position]
+    if (screen.state == Screen.Initialized) {
+      screen.create(container)
+      screen.create()
+      currentPosition = currentPositionProvider.invoke()
+      current = screens[currentPosition]
+      if (currentPosition == position && (screen.state == Screen.Created || screen.state == Screen.Paused)) {
+        current?.resume()
+      }
+    }
+    container.addView(screen.view, position)
+    return screen.view
+  }
 
-  override fun getItemCount(): Int = screens.size
+  override fun getCount(): Int = screens.size
 
   fun pause() {
     val screen = current
@@ -204,17 +181,13 @@ internal class ScreensAdapter(private val pagerPresenter: PagerPresenter<*,*,*>,
     screen?.destroy()
   }
 
-  fun <A : Any> scrollTo(screenIndex: Int, arg: A) {
+  fun <A : Any> setArgTo(screenIndex: Int, arg: A) {
     (screens[screenIndex] as? Screen<*, *, A>)?.setArg(arg)
   }
 
   fun getIndexOf(tag: String): Int {
-    screens.forEachIndexed { index, screen ->
-      if (screen.screenTag == tag) {
-        return index
-      }
-    }
-    throw Throwable("screen with tag $tag is not exist in pager")
+    val index = screens.indexOfFirst { it.screenTag == tag }
+    return if (index >= 0) index else throw Throwable("screen with tag $tag is not exist in pager")
   }
 
   fun <A : Any> setArg(arg: A) {
@@ -223,5 +196,14 @@ internal class ScreensAdapter(private val pagerPresenter: PagerPresenter<*,*,*>,
 
   fun <A : Any> setArgTo(tag: String, arg: A) {
     (screens[getIndexOf(tag)] as? Screen<*, *, A>)?.setArg(arg)
+  }
+
+  fun onPageSelected(position: Int) {
+    current?.pause()
+    presenter.onScreenPaused(currentPosition, current)
+    current = screens[position]
+    current?.resume()
+    presenter.onScreenResumed(position, current)
+    currentPosition = position
   }
 }

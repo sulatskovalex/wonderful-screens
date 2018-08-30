@@ -23,7 +23,7 @@ abstract class ScreensActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(contentId)
     router.attachToContainer(container)
-    router.setRoot(firstScreenTag)
+    router.setRoot(firstScreenTag, firstScreenArg)
   }
 
   @CallSuper

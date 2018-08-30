@@ -1,6 +1,6 @@
 package com.sulatskovalex.screensexample.pager
 
-import android.support.v7.widget.RecyclerView
+import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,12 +13,12 @@ import kotlinx.android.synthetic.main.screen_pager.view.*
 
 class MainPagerScreen(presenter: MainPagerPresenter, override val screenTag: String)
   : PagerScreen<MainPagerScreen, MainPagerPresenter, Unit>(presenter) {
-
+  override val firstScreenArg = Any()
   override val canScrollHorizontally: Boolean = true
   override val screenTags = arrayOf(PAGE_SCREEN_FIRST, PAGE_SCREEN_SECOND, PAGE_SCREEN_THIRD)
   override val firstScreenTag: String = PAGE_SCREEN_FIRST
 
-  override fun createViewWithRecycler(inflater: LayoutInflater, parent: ViewGroup): View {
+  override fun createViewWithPager(inflater: LayoutInflater, parent: ViewGroup): View {
     val view = inflater.inflate(R.layout.screen_pager, parent, false)
 
     view.first_page.setOnClickListener { presenter.onFirstPageClick() }
@@ -28,7 +28,7 @@ class MainPagerScreen(presenter: MainPagerPresenter, override val screenTag: Str
     return view
   }
 
-  override fun recycler(createdView: View): RecyclerView {
+  override fun pager(createdView: View): ViewPager {
     return createdView.findViewById(R.id.pager_list)
   }
 }

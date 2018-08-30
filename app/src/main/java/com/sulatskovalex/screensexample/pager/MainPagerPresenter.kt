@@ -6,18 +6,18 @@ import com.sulatskovalex.screensexample.PAGE_SCREEN_FIRST
 import com.sulatskovalex.screensexample.PAGE_SCREEN_SECOND
 import com.sulatskovalex.screensexample.PAGE_SCREEN_THIRD
 
-class MainPagerPresenter(router: Router) :
-    PagerPresenter<MainPagerPresenter, MainPagerScreen, Unit>(router) {
+class MainPagerPresenter(router: Router)
+  : PagerPresenter<MainPagerPresenter, MainPagerScreen, Unit>(router) {
 
   fun onFirstPageClick() {
-    openTab(PAGE_SCREEN_FIRST)
+    pagerRouter.openTab(PAGE_SCREEN_FIRST)
   }
 
   fun onSecondPageClick() {
-    openTab(PAGE_SCREEN_SECOND)
+    pagerRouter.openTab(PAGE_SCREEN_SECOND)
   }
 
   fun onThirdPageClick() {
-    openTab(PAGE_SCREEN_THIRD)
+    pagerRouter.openTab(PAGE_SCREEN_THIRD)
   }
 }
