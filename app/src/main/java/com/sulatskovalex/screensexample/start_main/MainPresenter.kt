@@ -9,18 +9,18 @@ import com.sulatskovalex.screensexample.PAGER_SCREEN_MAIN
 class MainPresenter(router: Router) : Presenter<MainPresenter, MainScreen, Unit>(router) {
 
   fun onContainerClick() {
-    router.forward(CONTAINER_SCREEN_MAIN)
+    rootRouter.forward(CONTAINER_SCREEN_MAIN)
   }
 
   fun onForwardClick() {
-    router.forward(MAIN_SCREEN)
+    rootRouter.forward(MAIN_SCREEN)
   }
 
   fun onPagerClick() {
-    router.forward(PAGER_SCREEN_MAIN)
+    rootRouter.forward(PAGER_SCREEN_MAIN)
   }
 
   fun onRootClick() {
-    router.setRoot(PAGER_SCREEN_MAIN)
+    rootRouter.setRoot(PAGER_SCREEN_MAIN)
   }
 }

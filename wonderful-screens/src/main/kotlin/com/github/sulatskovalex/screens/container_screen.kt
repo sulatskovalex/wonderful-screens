@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : ContainerPresenter<P, S, A>, A : Any>(
-    presenter: P)
+abstract class ContainerScreen<
+    S : ContainerScreen<S, P, A>,
+    P : ContainerPresenter<P, S, A>,
+    A : Any>(presenter: P)
   : Screen<S, P, A>(presenter), BackPressedHandler {
   abstract val firstScreenTag: String
+  abstract val firstScreenArg: Any
   private val router = Router()
 
   abstract fun createViewWithContainer(inflater: LayoutInflater, parent: ViewGroup): View
@@ -18,13 +21,12 @@ abstract class ContainerScreen<S : ContainerScreen<S, P, A>, P : ContainerPresen
   final override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view = createViewWithContainer(inflater, parent)
     router.attachToContainer(container(view))
-    router.setRoot(firstScreenTag)
+    router.setRoot(firstScreenTag, firstScreenArg)
     presenter.chlidRouter = router
     return view
   }
 
   override fun setArg(arg: A) {
-    if (arg == null) return
     if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
