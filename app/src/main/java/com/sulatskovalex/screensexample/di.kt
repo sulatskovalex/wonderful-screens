@@ -19,10 +19,10 @@ import com.sulatskovalex.screensexample.pager.screens.third.PageThirdPresenter
 import com.sulatskovalex.screensexample.pager.screens.third.PageThirdScreen
 import com.sulatskovalex.screensexample.start_main.MainPresenter
 import com.sulatskovalex.screensexample.start_main.MainScreen
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.module.module
 
-val mainModule = applicationContext {
-  bean { Router() }
+val mainModule = module {
+  single { Router() }
 
   screen(MAIN_SCREEN) { MainScreen(get(), MAIN_SCREEN) }
   presenter { MainPresenter(get()) }

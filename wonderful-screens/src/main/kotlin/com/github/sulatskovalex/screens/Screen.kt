@@ -24,7 +24,7 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
   internal var state = Initialized
     private set
 
-  internal fun create(parent: ViewGroup) {
+  internal fun createView(parent: ViewGroup) {
     this.activity = parent.context as ScreensActivity
     this.inflater = LayoutInflater.from(parent.context)
     this.view = createView(inflater, parent)
@@ -39,14 +39,7 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
         (activity.currentFocus ?: view).windowToken, 0)
   }
 
-  internal fun attachTo(container: ViewGroup, firstly: Boolean) {
-    container.addView(view)
-    if (firstly) {
-      onViewAdded(view)
-    }
-  }
-
-  protected open fun onViewAdded(view: View) {
+  open fun onViewAdded(view: View) {
 
   }
 

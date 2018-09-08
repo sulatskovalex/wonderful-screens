@@ -2,17 +2,13 @@ package com.github.sulatskovalex.screens
 
 import android.view.View
 import android.view.ViewGroup
-import org.koin.KoinContext
+import org.koin.core.KoinContext
 import org.koin.standalone.StandAloneContext
 
 open class Router {
-  private val stack: MutableList<Screen<*, *, *>> = mutableListOf()
+  internal val stack: MutableList<Screen<*, *, *>> = mutableListOf()
   private lateinit var activity: ScreensActivity
   private lateinit var container: ViewGroup
-  val current: Screen<*, *, *>?
-    get() = if (stack.isNotEmpty()) {
-      stack.last()
-    } else null
 
   fun forward(tag: String) {
     forward(tag, Unit)
@@ -49,7 +45,7 @@ open class Router {
 
   fun <A : Any> backTo(tag: String, arg: A) {
     var index = stack.size - 1
-    val current = this.current
+    val current = stack.lastOrNull()
     while (index >= 0) {
       val screen = stack[index]
       if (screen.screenTag == tag) {
@@ -75,30 +71,20 @@ open class Router {
 
   private fun <A : Any> replace(tag: String, argument: A, destroy: Boolean) {
     if (!stack.isEmpty()) {
-      pause(current, destroy)
-      if (!destroy && stack.size > 2) {
-        stack[stack.size - 2].view.removeFromParent()
-      }
+      pause(stack.lastOrNull(), destroy)
     }
     val screen: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
     stack.add(screen)
-    screen.create(container)
+    screen.createView(container)
     (screen as? ChildScreen)?.setChildRouter(this)
-    activity.requestPermissionsResultHandler = screen as? RequestPermissionsResultHandler
-    activity.activityResultHandler = screen as? ActivityResultHandler
-    activity.configurationChangedHandler = screen as? ConfigurationChangedHandler
     screen.setArg(argument)
     screen.create()
     resume(screen)
   }
 
-  fun handleBack(): Boolean {
-    return handleBack(Unit)
-  }
-
-  fun <A : Any> handleBack(arg: A): Boolean {
+  internal fun <A : Any> handleBack(arg: A): Boolean {
     if (!stack.isEmpty()) {
-      val current = current
+      val current = stack.lastOrNull()
       if (current is BackPressedHandler) {
         val handled = current.onBackPressed(arg)
         if (handled) {
@@ -106,44 +92,48 @@ open class Router {
         }
       }
       pause(current, true)
-      (this.current as? Screen<*, *, A>?)?.setArg(arg)
-      resume(this.current)
+      val screen = stack.lastOrNull()
+      (screen as? Screen<*, *, A>?)?.setArg(arg)
+      resume(screen)
       return stack.isNotEmpty()
     }
     return false
   }
 
   private fun resume(screen: Screen<*, *, *>?) {
-    if (screen == null) {
-      return
-    }
-    if (screen.state == Screen.Created || screen.state == Screen.Paused) {
-      screen.view.removeFromParent()
-      screen.attachTo(container, screen.state == Screen.Created)
-      screen.resume()
+    screen?.apply {
+      if (state == Screen.Created || state == Screen.Paused) {
+        container.addView(view)
+        if (state == Screen.Created) {
+          onViewAdded(view)
+        }
+        activity.requestPermissionsResultHandler = screen as? RequestPermissionsResultHandler
+        activity.activityResultHandler = screen as? ActivityResultHandler
+        activity.configurationChangedHandler = screen as? ConfigurationChangedHandler
+        resume()
+      }
     }
   }
 
   private fun pause(screen: Screen<*, *, *>?, destroy: Boolean) {
-    if (screen == null) {
-      return
-    }
-    if (screen.state == Screen.Resumed) {
-      screen.pause()
-    }
-    if (destroy && (screen.state == Screen.Paused || screen.state == Screen.Created)) {
-      screen.destroy()
-      screen.view.removeFromParent()
-      stack.remove(screen)
+    screen?.apply {
+      if (state == Screen.Resumed) {
+        pause()
+        view.removeFromParent()
+      }
+      if (destroy && (state == Screen.Paused || state == Screen.Created)) {
+        destroy()
+        stack.remove(this)
+      }
     }
   }
 
   internal fun onResume() {
-    resume(current)
+    resume(stack.lastOrNull())
   }
 
   internal fun onPause() {
-    pause(current, false)
+    pause(stack.lastOrNull(), false)
   }
 
   fun attachToContainer(container: ViewGroup) {
@@ -152,9 +142,7 @@ open class Router {
   }
 
   private fun View.removeFromParent() {
-    if (parent != null) {
-      (parent as? ViewGroup)?.removeView(this)
-    }
+    (parent as? ViewGroup?)?.removeView(this)
   }
 
   internal fun onDestroy() {
