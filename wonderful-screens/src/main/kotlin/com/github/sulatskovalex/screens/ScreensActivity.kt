@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
+import org.koin.dsl.context.ModuleDefinition
 
 abstract class ScreensActivity : AppCompatActivity() {
 
@@ -43,7 +44,7 @@ abstract class ScreensActivity : AppCompatActivity() {
     super.onPause()
   }
 
-  fun <A : Any> onBackPressed(arg: A) {
+  internal fun <A : Any> onBackPressed(arg: A) {
     if (!router.handleBack(arg)) {
       super.onBackPressed()
     }
@@ -83,6 +84,6 @@ interface ConfigurationChangedHandler {
   fun onConfigurationChanged(newConfig: Configuration?)
 }
 
-inline fun org.koin.dsl.context.Context.screen(tag: String, crossinline sc: () -> Screen<*, *, *>) = factory(tag) { sc.invoke() }
+inline fun ModuleDefinition.screen(tag: String, crossinline sc: () -> Screen<*, *, *>) = factory(tag) { sc.invoke() }
 
-inline fun <reified T : Presenter<*, *, *>> org.koin.dsl.context.Context.presenter(crossinline presenter: () -> T) = factory { presenter.invoke() }
+inline fun <reified T : Presenter<*, *, *>> ModuleDefinition.presenter(crossinline presenter: () -> T) = factory { presenter.invoke() }

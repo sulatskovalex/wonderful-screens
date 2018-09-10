@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import com.github.sulatskovalex.screens.Screen.Companion.Created
 import com.github.sulatskovalex.screens.Screen.Companion.Paused
 import com.github.sulatskovalex.screens.Screen.Companion.Resumed
-import org.koin.KoinContext
+import org.koin.core.KoinContext
 import org.koin.standalone.StandAloneContext
 
 abstract class PagerScreen<
@@ -21,7 +21,6 @@ abstract class PagerScreen<
   abstract val screenTags: Array<String>
   abstract val firstScreenTag: String
   abstract val firstScreenArg: Any
-  abstract val canScrollHorizontally: Boolean
   private lateinit var adapter: ScreensAdapter
   private lateinit var viewPager: ViewPager
 
@@ -147,7 +146,7 @@ internal class ScreensAdapter(
   override fun instantiateItem(container: ViewGroup, position: Int): Any {
     val screen = screens[position]
     if (screen.state == Screen.Initialized) {
-      screen.create(container)
+      screen.createView(container)
       screen.create()
       currentPosition = currentPositionProvider.invoke()
       current = screens[currentPosition]

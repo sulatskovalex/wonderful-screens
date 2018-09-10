@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.screen_pager.view.*
 class MainPagerScreen(presenter: MainPagerPresenter, override val screenTag: String)
   : PagerScreen<MainPagerScreen, MainPagerPresenter, Unit>(presenter) {
   override val firstScreenArg = Any()
-  override val canScrollHorizontally: Boolean = true
   override val screenTags = arrayOf(PAGE_SCREEN_FIRST, PAGE_SCREEN_SECOND, PAGE_SCREEN_THIRD)
   override val firstScreenTag: String = PAGE_SCREEN_FIRST
 

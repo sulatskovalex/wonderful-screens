@@ -22,7 +22,7 @@ abstract class ContainerScreen<
     val view = createViewWithContainer(inflater, parent)
     router.attachToContainer(container(view))
     router.setRoot(firstScreenTag, firstScreenArg)
-    presenter.chlidRouter = router
+    presenter.childRouter = router
     return view
   }
 
@@ -30,7 +30,7 @@ abstract class ContainerScreen<
     if (arg::class.java == presenter.argumentClass) {
       super.setArg(arg)
     }
-    (router.current as? Screen<*, *, A>?)?.setArg(arg)
+    (router.stack.lastOrNull() as? Screen<*, *, A>?)?.setArg(arg)
   }
 
   @CallSuper
@@ -58,19 +58,19 @@ abstract class ContainerScreen<
 
 open class ContainerPresenter<P : ContainerPresenter<P, S, A>, S : ContainerScreen<S, P, A>, A : Any>(router: Router)
   : Presenter<P, S, A>(router) {
-  lateinit var chlidRouter: Router
+  lateinit var childRouter: Router
     internal set
 }
 
 open class ChildPresenter<P : ChildPresenter<P, S, A>, S : ChildScreen<S, P, A>, A : Any>(router: Router)
   : Presenter<P, S, A>(router) {
-  lateinit var chlidRouter: Router
+  lateinit var childRouter: Router
     internal set
 }
 
 abstract class ChildScreen<S : ChildScreen<S, P, A>, P : ChildPresenter<P, S, A>, A : Any>(presenter: P)
   : Screen<S, P, A>(presenter) {
   internal fun setChildRouter(childRouter: Router) {
-    presenter.chlidRouter = childRouter
+    presenter.childRouter = childRouter
   }
 }

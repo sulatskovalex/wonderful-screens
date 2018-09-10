@@ -12,6 +12,6 @@ class ContainerFirstPresenter(router: Router)
   }
 
   fun onReplaceClick() {
-    chlidRouter.replace(CONTAINER_SCREEN_SECOND)
+    childRouter.replace(CONTAINER_SCREEN_SECOND)
   }
 }

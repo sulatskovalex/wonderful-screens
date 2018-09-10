@@ -2,16 +2,16 @@
 
 buildscript {
     ext.kotlin_version = '1.2.61'
-    ext.koin_version = '0.9.3'
-    ext.support_version = '27.1.1'
+    ext.koin_version = '1.0.0-RC-2'
+    ext.support_version = '28.0.0-rc02'
     ext.coroutines_version = '0.23.4'
     ext.retrofit_version = '2.4.0'
     ext.gson_version = '2.8.5'
-    ext.build_tools_version = '27.0.3'
-    ext.target_sdk_version = 27
-    ext.compile_sdk_version = 27
+    ext.build_tools_version = '28.0.2'
+    ext.target_sdk_version = 28
+    ext.compile_sdk_version = 28
     ext.min_sdk_version = 15
-    ext.screens_version = '0.2'
+    ext.screens_version = '0.2.1'
     repositories {
         google()
         jcenter()

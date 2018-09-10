@@ -12,10 +12,10 @@ class ContainerSecondPresenter(router: Router)
   }
 
   fun onReplaceClick() {
-    chlidRouter.replace(CONTAINER_SCREEN_FIRST)
+    childRouter.replace(CONTAINER_SCREEN_FIRST)
   }
 
   fun onForwardClick() {
-    chlidRouter.forward(CONTAINER_SCREEN_FIRST)
+    childRouter.forward(CONTAINER_SCREEN_FIRST)
   }
 }
