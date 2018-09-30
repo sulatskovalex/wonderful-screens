@@ -107,9 +107,9 @@ open class Router {
         if (state == Screen.Created) {
           onViewAdded(view)
         }
-        activity.requestPermissionsResultHandler = screen as? RequestPermissionsResultHandler
-        activity.activityResultHandler = screen as? ActivityResultHandler
-        activity.configurationChangedHandler = screen as? ConfigurationChangedHandler
+        activity.requestPermissionsResultHandler = this as? RequestPermissionsResultHandler
+        activity.activityResultHandler = this as? ActivityResultHandler
+        activity.configurationChangedHandler = this as? ConfigurationChangedHandler
         resume()
       }
     }

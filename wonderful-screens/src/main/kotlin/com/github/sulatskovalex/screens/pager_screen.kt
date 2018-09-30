@@ -27,7 +27,7 @@ abstract class PagerScreen<
   final override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view = createViewWithPager(inflater, parent)
     viewPager = pager(view)
-    adapter = ScreensAdapter(screenTags, presenter) {
+    adapter = ScreensAdapter(activity, screenTags, presenter) {
       viewPager.currentItem
     }
     viewPager.adapter = adapter
@@ -54,8 +54,8 @@ abstract class PagerScreen<
     adapter.setArg(arg)
   }
 
-  protected open fun createViewWithPager(inflater: LayoutInflater,
-                                         parent: ViewGroup): View = ViewPager(activity)
+  protected open fun createViewWithPager(
+          inflater: LayoutInflater, parent: ViewGroup): View = ViewPager(activity)
 
   protected open fun pager(createdView: View): ViewPager = createdView as ViewPager
 
@@ -118,6 +118,7 @@ open class PagerPresenter<P : PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>,
 }
 
 internal class ScreensAdapter(
+        val activity: ScreensActivity,
     tags: Array<String>,
     private val presenter: PagerPresenter<*, *, *>,
     private val currentPositionProvider: () -> Int)
@@ -132,7 +133,7 @@ internal class ScreensAdapter(
       }
 
   var currentPosition: Int = 0
-  private var current: Screen<*, *, *>? = null
+  var current: Screen<*, *, *>? = null
 
   fun <A : Any> handleBack(arg: A): Boolean {
     val current = this.current
@@ -151,11 +152,18 @@ internal class ScreensAdapter(
       currentPosition = currentPositionProvider.invoke()
       current = screens[currentPosition]
       if (currentPosition == position && (screen.state == Screen.Created || screen.state == Screen.Paused)) {
+        attachListeners(current)
         current?.resume()
       }
     }
     container.addView(screen.view, position)
     return screen.view
+  }
+
+  private fun attachListeners(current: Screen<*, *, *>?) {
+    activity.activityResultHandler = current as? ActivityResultHandler
+    activity.requestPermissionsResultHandler = current as? RequestPermissionsResultHandler
+    activity.configurationChangedHandler = current as? ConfigurationChangedHandler
   }
 
   override fun getCount(): Int = screens.size
@@ -170,6 +178,7 @@ internal class ScreensAdapter(
   fun resume() {
     val screen = current
     if (screen != null && (screen.state == Created || screen.state == Paused)) {
+      attachListeners(current)
       screen.resume()
     }
   }
@@ -201,6 +210,7 @@ internal class ScreensAdapter(
     current?.pause()
     presenter.onScreenPaused(currentPosition, current)
     current = screens[position]
+    attachListeners(current)
     current?.resume()
     presenter.onScreenResumed(position, current)
     currentPosition = position
