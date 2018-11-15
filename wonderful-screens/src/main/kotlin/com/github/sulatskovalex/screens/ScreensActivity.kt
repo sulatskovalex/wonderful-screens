@@ -1,11 +1,13 @@
 package com.github.sulatskovalex.screens
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import org.koin.dsl.context.ModuleDefinition
 
 abstract class ScreensActivity : AppCompatActivity() {
@@ -44,7 +46,7 @@ abstract class ScreensActivity : AppCompatActivity() {
     super.onPause()
   }
 
-  internal fun <A : Any> onBackPressed(arg: A) {
+  internal fun  onBackPressed(arg: Any) {
     if (!router.handleBack(arg)) {
       super.onBackPressed()
     }
@@ -73,7 +75,7 @@ interface RequestPermissionsResultHandler {
 }
 
 interface BackPressedHandler {
-  fun <A : Any> onBackPressed(arg: A): Boolean
+  fun  onBackPressed(arg: Any): Boolean
 }
 
 interface ActivityResultHandler {
@@ -84,6 +86,11 @@ interface ConfigurationChangedHandler {
   fun onConfigurationChanged(newConfig: Configuration?)
 }
 
-inline fun ModuleDefinition.screen(tag: String, crossinline sc: () -> Screen<*, *, *>) = factory(tag) { sc.invoke() }
+inline fun ModuleDefinition.screen(tag: String, crossinline sc: () -> Screen<*, *>) = factory(tag) { sc.invoke() }
 
-inline fun <reified T : Presenter<*, *, *>> ModuleDefinition.presenter(crossinline presenter: () -> T) = factory { presenter.invoke() }
+inline fun <reified T : Presenter<*, *>> ModuleDefinition.presenter(crossinline presenter: () -> T) = factory { presenter.invoke() }
+
+fun Screen<*,*>.hideKeyboard() {
+  (activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)?.hideSoftInputFromWindow(
+      (activity.currentFocus ?: view).windowToken, 0)
+}

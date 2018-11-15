@@ -1,15 +1,12 @@
 package com.github.sulatskovalex.screens
 
-import android.content.Context
 import android.support.annotation.CallSuper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.Job
 
-abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(protected val presenter: P) {
+abstract class Screen<S : Screen<S, P>, P : Presenter<P, S>>(protected val presenter: P) {
 
   init {
     presenter.screen = this as S
@@ -18,7 +15,8 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
   abstract val screenTag: String
   lateinit var view: android.view.View
     private set
-  protected lateinit var activity: ScreensActivity
+  lateinit var activity: ScreensActivity
+    internal set
   protected lateinit var inflater: LayoutInflater
     private set
   internal var state = Initialized
@@ -30,27 +28,21 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
     this.view = createView(inflater, parent)
     this.view.isFocusable = true
     this.view.isClickable = true
+    parent.addView(view)
+    onViewAdded(view)
   }
 
   abstract fun createView(inflater: LayoutInflater, parent: ViewGroup): android.view.View
-
-  fun hideKeyBoard() {
-    (activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)?.hideSoftInputFromWindow(
-        (activity.currentFocus ?: view).windowToken, 0)
-  }
 
   open fun onViewAdded(view: View) {
 
   }
 
-  internal open fun setArg(arg: A) {
-    if (arg::class.java == presenter.argumentClass) {
-      presenter.argument = arg
-    }
+  internal open fun setArg(arg: Any) {
+    presenter.argument = arg
   }
 
   internal open fun create() {
-    Log.e(javaClass.simpleName," create")
     state = Created
     onCreate()
     presenter.onCreate()
@@ -59,7 +51,6 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
   protected open fun onCreate() { }
 
   internal open fun resume() {
-    Log.e(javaClass.simpleName," resume")
     state = Resumed
     onResume()
     presenter.onResume()
@@ -68,7 +59,6 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
   protected open fun onResume() { }
 
   internal open fun pause() {
-    Log.e(javaClass.simpleName," pause")
     state = Paused
     onPause()
     presenter.onPause()
@@ -77,7 +67,6 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
   protected open fun onPause() { }
 
   internal open fun destroy() {
-    Log.e(javaClass.simpleName,  " destroy")
     state = Destroyed
     onDestroy()
     presenter.onDestroy()
@@ -94,13 +83,20 @@ abstract class Screen<S : Screen<S, P, A>, P : Presenter<P, S, A>, A : Any>(prot
   }
 }
 
-open class Presenter<P : Presenter<P, S, A>, S : Screen<S, P, A>, A : Any>(val rootRouter: Router) {
+open class Presenter<P : Presenter<P, S>, S : Screen<S, P>>(protected val rootRouter: Router) {
   protected val jobs = mutableListOf<Job>()
   lateinit var screen: S
     internal set
-  lateinit var argument: A
-    internal set
-  open var argumentClass: Class<A> = Any::class.java as Class<A>
+  var argument: Any = Unit
+    internal set(value) {
+      val prev = field
+      field = value
+      onArgumentChanged(prev, field)
+    }
+
+  protected open fun onArgumentChanged(prevArg: Any, newArg: Any) {
+
+  }
 
   open fun onResume() {}
   open fun onCreate() {}

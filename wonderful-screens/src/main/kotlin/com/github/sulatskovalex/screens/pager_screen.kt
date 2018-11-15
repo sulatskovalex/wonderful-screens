@@ -13,10 +13,9 @@ import org.koin.core.KoinContext
 import org.koin.standalone.StandAloneContext
 
 abstract class PagerScreen<
-    S : PagerScreen<S, P, A>,
-    P : PagerPresenter<P, S, A>,
-    A : Any>(presenter: P)
-  : Screen<S, P, A>(presenter), BackPressedHandler, PagerRouter {
+    S : PagerScreen<S, P>,
+    P : PagerPresenter<P, S>>(presenter: P)
+  : Screen<S, P>(presenter), BackPressedHandler, PagerRouter {
 
   abstract val screenTags: Array<String>
   abstract val firstScreenTag: String
@@ -47,20 +46,18 @@ abstract class PagerScreen<
     return view
   }
 
-  override fun setArg(arg: A) {
-    if (arg::class.java == presenter.argumentClass) {
-      super.setArg(arg)
-    }
+  override fun setArg(arg: Any) {
+    super.setArg(arg)
     adapter.setArg(arg)
   }
 
   protected open fun createViewWithPager(
-          inflater: LayoutInflater, parent: ViewGroup): View = ViewPager(activity)
+      inflater: LayoutInflater, parent: ViewGroup): View = ViewPager(activity)
 
   protected open fun pager(createdView: View): ViewPager = createdView as ViewPager
 
   @CallSuper
-  override fun <A : Any> onBackPressed(arg: A): Boolean {
+  override fun onBackPressed(arg: Any): Boolean {
     return adapter.handleBack(arg)
   }
 
@@ -83,12 +80,12 @@ abstract class PagerScreen<
     openTab(tag, Unit)
   }
 
-  override fun <A : Any> setArgTo(tag: String, arg: A) {
+  final override fun setArgTo(tag: String, arg: Any) {
     adapter.setArgTo(tag, arg)
   }
 
   @CallSuper
-  override fun <A : Any> openTab(tag: String, arg: A) {
+  final override fun openTab(tag: String, arg: Any) {
     val position = adapter.getIndexOf(tag)
     adapter.setArgTo(position, arg)
     viewPager.currentItem = position
@@ -96,46 +93,44 @@ abstract class PagerScreen<
 }
 
 interface PagerRouter {
-  fun <A : Any> openTab(tag: String, arg: A)
+  fun openTab(tag: String, arg: Any)
   fun openTab(tag: String)
-  fun <A : Any> setArgTo(tag: String, arg: A)
+  fun setArgTo(tag: String, arg: Any)
 }
 
-open class PagerPresenter<P : PagerPresenter<P, S, A>, S : PagerScreen<S, P, A>, A : Any>(router: Router)
-  : Presenter<P, S, A>(router) {
+open class PagerPresenter<P : PagerPresenter<P, S>, S : PagerScreen<S, P>>(router: Router)
+  : Presenter<P, S>(router) {
 
   lateinit var pagerRouter: PagerRouter
     internal set
 
-  open fun onScreenResumed(position: Int, screen: Screen<*, *, *>?) {
+  open fun onScreenResumed(position: Int, screen: Screen<*, *>?) {
 
   }
 
-  open fun onScreenPaused(position: Int, screen: Screen<*, *, *>?) {
+  open fun onScreenPaused(position: Int, screen: Screen<*, *>?) {
 
   }
-
 }
 
 internal class ScreensAdapter(
-        val activity: ScreensActivity,
+    val activity: ScreensActivity,
     tags: Array<String>,
-    private val presenter: PagerPresenter<*, *, *>,
+    private val presenter: PagerPresenter<*, *>,
     private val currentPositionProvider: () -> Int)
   : PagerAdapter() {
 
   override fun isViewFromObject(view: View, obj: Any): Boolean = view == obj
 
-  private val screens: List<Screen<*, *, *>> =
+  private val screens: List<Screen<*, *>> =
       List(tags.size) { index ->
-        val screen: Screen<*, *, *> = (StandAloneContext.koinContext as KoinContext).get(tags[index])
-        screen
+        StandAloneContext.getKoin().koinContext.get<Screen<*, *>>(tags[index])
       }
 
   var currentPosition: Int = 0
-  var current: Screen<*, *, *>? = null
+  var current: Screen<*, *>? = null
 
-  fun <A : Any> handleBack(arg: A): Boolean {
+  fun handleBack(arg: Any): Boolean {
     val current = this.current
     return current != null && current is BackPressedHandler && current.onBackPressed(arg)
   }
@@ -156,14 +151,24 @@ internal class ScreensAdapter(
         current?.resume()
       }
     }
-    container.addView(screen.view, position)
+    if (screen.view.parent == null) {
+      container.addView(screen.view)
+    }
     return screen.view
   }
 
-  private fun attachListeners(current: Screen<*, *, *>?) {
-    activity.activityResultHandler = current as? ActivityResultHandler
-    activity.requestPermissionsResultHandler = current as? RequestPermissionsResultHandler
-    activity.configurationChangedHandler = current as? ConfigurationChangedHandler
+  private fun attachListeners(current: Screen<*, *>?) {
+    current?.apply {
+      if (this is ActivityResultHandler) {
+        activity.activityResultHandler = this
+      }
+      if (this is RequestPermissionsResultHandler) {
+        activity.requestPermissionsResultHandler = this
+      }
+      if (this is ConfigurationChangedHandler) {
+        activity.configurationChangedHandler = this
+      }
+    }
   }
 
   override fun getCount(): Int = screens.size
@@ -189,8 +194,8 @@ internal class ScreensAdapter(
     screen?.destroy()
   }
 
-  fun <A : Any> setArgTo(screenIndex: Int, arg: A) {
-    (screens[screenIndex] as? Screen<*, *, A>)?.setArg(arg)
+  fun  setArgTo(screenIndex: Int, arg: Any) {
+    screens[screenIndex].setArg(arg)
   }
 
   fun getIndexOf(tag: String): Int {
@@ -198,12 +203,12 @@ internal class ScreensAdapter(
     return if (index >= 0) index else throw Throwable("screen with tag $tag is not exist in pager")
   }
 
-  fun <A : Any> setArg(arg: A) {
-    (current as? Screen<*, *, A>?)?.setArg(arg)
+  fun  setArg(arg: Any) {
+    current?.setArg(arg)
   }
 
-  fun <A : Any> setArgTo(tag: String, arg: A) {
-    (screens[getIndexOf(tag)] as? Screen<*, *, A>)?.setArg(arg)
+  fun  setArgTo(tag: String, arg: Any) {
+    screens[getIndexOf(tag)].setArg(arg)
   }
 
   fun onPageSelected(position: Int) {

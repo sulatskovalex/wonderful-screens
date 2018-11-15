@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 
 abstract class ContainerScreen<
-    S : ContainerScreen<S, P, A>,
-    P : ContainerPresenter<P, S, A>,
-    A : Any>(presenter: P)
-  : Screen<S, P, A>(presenter), BackPressedHandler {
+    S : ContainerScreen<S, P>,
+    P : ContainerPresenter<P, S>>(presenter: P)
+  : Screen<S, P>(presenter), BackPressedHandler {
   abstract val firstScreenTag: String
   abstract val firstScreenArg: Any
   private val router = Router()
@@ -24,13 +23,6 @@ abstract class ContainerScreen<
     router.setRoot(firstScreenTag, firstScreenArg)
     presenter.childRouter = router
     return view
-  }
-
-  override fun setArg(arg: A) {
-    if (arg::class.java == presenter.argumentClass) {
-      super.setArg(arg)
-    }
-    (router.stack.lastOrNull() as? Screen<*, *, A>?)?.setArg(arg)
   }
 
   @CallSuper
@@ -52,24 +44,24 @@ abstract class ContainerScreen<
   }
 
   @CallSuper
-  override fun <A : Any> onBackPressed(arg: A): Boolean = router.handleBack(arg)
+  override fun onBackPressed(arg: Any): Boolean = router.handleBack(arg)
 }
 
 
-open class ContainerPresenter<P : ContainerPresenter<P, S, A>, S : ContainerScreen<S, P, A>, A : Any>(router: Router)
-  : Presenter<P, S, A>(router) {
+open class ContainerPresenter<P : ContainerPresenter<P, S>, S : ContainerScreen<S, P>>(router: Router)
+  : Presenter<P, S>(router) {
   lateinit var childRouter: Router
     internal set
 }
 
-open class ChildPresenter<P : ChildPresenter<P, S, A>, S : ChildScreen<S, P, A>, A : Any>(router: Router)
-  : Presenter<P, S, A>(router) {
+open class ChildPresenter<P : ChildPresenter<P, S>, S : ChildScreen<S, P>>(router: Router)
+  : Presenter<P, S>(router) {
   lateinit var childRouter: Router
     internal set
 }
 
-abstract class ChildScreen<S : ChildScreen<S, P, A>, P : ChildPresenter<P, S, A>, A : Any>(presenter: P)
-  : Screen<S, P, A>(presenter) {
+abstract class ChildScreen<S : ChildScreen<S, P>, P : ChildPresenter<P, S>>(presenter: P)
+  : Screen<S, P>(presenter) {
   internal fun setChildRouter(childRouter: Router) {
     presenter.childRouter = childRouter
   }

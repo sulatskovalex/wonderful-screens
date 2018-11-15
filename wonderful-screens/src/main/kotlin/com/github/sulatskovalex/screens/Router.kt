@@ -1,12 +1,10 @@
 package com.github.sulatskovalex.screens
 
-import android.view.View
 import android.view.ViewGroup
-import org.koin.core.KoinContext
 import org.koin.standalone.StandAloneContext
 
 open class Router {
-  internal val stack: MutableList<Screen<*, *, *>> = mutableListOf()
+  private val stack: MutableList<Screen<*, *>> = mutableListOf()
   private lateinit var activity: ScreensActivity
   private lateinit var container: ViewGroup
 
@@ -14,7 +12,7 @@ open class Router {
     forward(tag, Unit)
   }
 
-  fun <A : Any> forward(tag: String, arg: A) {
+  fun forward(tag: String, arg: Any) {
     replace(tag, arg, false)
   }
 
@@ -22,11 +20,11 @@ open class Router {
     replace(tag, Unit)
   }
 
-  fun <A : Any> replace(tag: String, arg: A) {
+  fun replace(tag: String, arg: Any) {
     replace(tag, arg, true)
   }
 
-  fun <A : Any> setRoot(tag: String, arg: A) {
+  fun setRoot(tag: String, arg: Any) {
     var index = stack.size - 1
     while (index >= 0) {
       pause(stack[index], true)
@@ -43,14 +41,14 @@ open class Router {
     backTo(tag, Unit)
   }
 
-  fun <A : Any> backTo(tag: String, arg: A) {
+  fun backTo(tag: String, arg: Any) {
     var index = stack.size - 1
     val current = stack.lastOrNull()
     while (index >= 0) {
       val screen = stack[index]
       if (screen.screenTag == tag) {
         if (screen != current) {
-          (screen as? Screen<*, *, A>)?.setArg(arg)
+          screen.setArg(arg)
           resume(screen)
           break
         }
@@ -61,7 +59,7 @@ open class Router {
     }
   }
 
-  fun <A : Any> back(arg: A) {
+  fun back(arg: Any) {
     activity.onBackPressed(arg)
   }
 
@@ -69,11 +67,11 @@ open class Router {
     back(Unit)
   }
 
-  private fun <A : Any> replace(tag: String, argument: A, destroy: Boolean) {
+  private fun replace(tag: String, argument: Any, destroy: Boolean) {
     if (!stack.isEmpty()) {
       pause(stack.lastOrNull(), destroy)
     }
-    val screen: Screen<*, *, A> = (StandAloneContext.koinContext as KoinContext).get(tag)
+    val screen: Screen<*, *> = StandAloneContext.getKoin().koinContext.get(tag)
     stack.add(screen)
     screen.createView(container)
     (screen as? ChildScreen)?.setChildRouter(this)
@@ -82,7 +80,7 @@ open class Router {
     resume(screen)
   }
 
-  internal fun <A : Any> handleBack(arg: A): Boolean {
+  internal fun handleBack(arg: Any): Boolean {
     if (!stack.isEmpty()) {
       val current = stack.lastOrNull()
       if (current is BackPressedHandler) {
@@ -93,20 +91,16 @@ open class Router {
       }
       pause(current, true)
       val screen = stack.lastOrNull()
-      (screen as? Screen<*, *, A>?)?.setArg(arg)
+      screen?.setArg(arg)
       resume(screen)
       return stack.isNotEmpty()
     }
     return false
   }
 
-  private fun resume(screen: Screen<*, *, *>?) {
+  private fun resume(screen: Screen<*, *>?) {
     screen?.apply {
       if (state == Screen.Created || state == Screen.Paused) {
-        container.addView(view)
-        if (state == Screen.Created) {
-          onViewAdded(view)
-        }
         activity.requestPermissionsResultHandler = this as? RequestPermissionsResultHandler
         activity.activityResultHandler = this as? ActivityResultHandler
         activity.configurationChangedHandler = this as? ConfigurationChangedHandler
@@ -115,17 +109,21 @@ open class Router {
     }
   }
 
-  private fun pause(screen: Screen<*, *, *>?, destroy: Boolean) {
+  private fun pause(screen: Screen<*, *>?, destroy: Boolean) {
     screen?.apply {
       if (state == Screen.Resumed) {
         pause()
-        view.removeFromParent()
       }
       if (destroy && (state == Screen.Paused || state == Screen.Created)) {
         destroy()
+        (view.parent as? ViewGroup?)?.removeView(view)
         stack.remove(this)
       }
     }
+  }
+
+  fun setArgsTo(screenTag: String, arg: Any) {
+    stack.firstOrNull { it.screenTag == screenTag }?.setArg(arg)
   }
 
   internal fun onResume() {
@@ -139,10 +137,6 @@ open class Router {
   fun attachToContainer(container: ViewGroup) {
     this.container = container
     this.activity = container.context as ScreensActivity
-  }
-
-  private fun View.removeFromParent() {
-    (parent as? ViewGroup?)?.removeView(this)
   }
 
   internal fun onDestroy() {
