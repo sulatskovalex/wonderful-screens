@@ -116,8 +116,10 @@ open class Router {
       }
       if (destroy && (state == Screen.Paused || state == Screen.Created)) {
         destroy()
-        (view.parent as? ViewGroup?)?.removeView(view)
         stack.remove(this)
+        if (stack.isNotEmpty()) {
+          (view.parent as? ViewGroup?)?.removeView(view)
+        }
       }
     }
   }

@@ -10,7 +10,7 @@ Project `build.gradle`
 
 ```
 buildscript {
-  ext.screens_version = '0.2.1'
+  ext.screens_version = '0.2.2'
 }
 
 allprojects {
@@ -23,4 +23,4 @@ allprojects {
 module `build.gradle`
 
 
-`implementation "com.github.sulatskovalex:wonderful-screens:$screens_version"`
+`implementation "com.github.sulatskovalex:screens:$screens_version"`
