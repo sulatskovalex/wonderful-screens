@@ -6,8 +6,14 @@ import android.view.ViewGroup
 import com.github.sulatskovalex.screens.Screen
 import com.sulatskovalex.screensexample.R
 
-class PageFirstScreen(presenter: PageFirstPresenter, override val screenTag: String)
-  : Screen<PageFirstScreen, PageFirstPresenter, Unit>(presenter) {
+class PageFirstScreen(
+        presenter: PageFirstPresenter,
+        override val screenTag: String = Tag)
+  : Screen<PageFirstScreen, PageFirstPresenter>(presenter) {
+
+  companion object {
+    const val Tag = "PAGE_SCREEN_FIRST"
+  }
 
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View =
       inflater.inflate(R.layout.screen_page_first, parent, false)

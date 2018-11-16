@@ -4,4 +4,4 @@ import com.github.sulatskovalex.screens.Presenter
 import com.github.sulatskovalex.screens.Router
 
 class PageThirdPresenter(router: Router)
-  : Presenter<PageThirdPresenter, PageThirdScreen, Unit>(router)
+  : Presenter<PageThirdPresenter, PageThirdScreen>(router)

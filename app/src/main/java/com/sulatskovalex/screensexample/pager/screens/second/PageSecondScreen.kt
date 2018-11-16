@@ -8,8 +8,14 @@ import com.github.sulatskovalex.screens.Screen
 import com.sulatskovalex.screensexample.R
 import kotlinx.android.synthetic.main.screen_page_second.view.*
 
-class PageSecondScreen(presenter: PageSecondPresenter, override val screenTag: String)
-  : Screen<PageSecondScreen, PageSecondPresenter, Unit>(presenter) {
+class PageSecondScreen(
+        presenter: PageSecondPresenter,
+        override val screenTag: String = Tag)
+  : Screen<PageSecondScreen, PageSecondPresenter>(presenter) {
+
+  companion object {
+    const val Tag = "PAGE_SCREEN_SECOND"
+  }
 
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view = inflater.inflate(R.layout.screen_page_second, parent, false)

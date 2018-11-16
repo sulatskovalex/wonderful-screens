@@ -1,30 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+  
+  <android.support.v7.widget.Toolbar
+      android:id="@+id/second_screen_toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="?attr/actionBarSize"
+      android:background="@color/colorPrimary"
+      app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
+      app:titleTextColor="@android:color/white"
+      app:title="Second container screen"/>
+
+  <TextView
+      android:id="@+id/second_argument"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"/>
+
+  <EditText
+      android:id="@+id/second_back_argument"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:hint="argument for first screen"/>
 
   <Button
       android:id="@+id/second_forward"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
-      android:text="forward" />
+      android:text="forward first screen" />
 
   <Button
       android:id="@+id/second_replace"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
-      android:text="replace" />
+      android:text="replace first screen" />
 
   <Button
       android:id="@+id/second_back"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
-      android:text="back" />
+      android:text="back to first screen" />
 
 </LinearLayout>

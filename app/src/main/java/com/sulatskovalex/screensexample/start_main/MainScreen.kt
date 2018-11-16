@@ -7,8 +7,12 @@ import com.github.sulatskovalex.screens.Screen
 import com.sulatskovalex.screensexample.R
 import kotlinx.android.synthetic.main.screen_main.view.*
 
-class MainScreen(presenter: MainPresenter, override val screenTag: String)
-  : Screen<MainScreen, MainPresenter, Unit>(presenter) {
+class MainScreen(presenter: MainPresenter, override val screenTag: String= Tag)
+  : Screen<MainScreen, MainPresenter>(presenter) {
+
+  companion object {
+    const val Tag = "MAIN_SCREEN"
+  }
 
   override fun createView(inflater: LayoutInflater, parent: ViewGroup): View {
     val view: View = inflater.inflate(R.layout.screen_main, parent, false)

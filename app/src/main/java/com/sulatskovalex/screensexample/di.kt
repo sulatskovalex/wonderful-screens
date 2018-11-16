@@ -24,34 +24,34 @@ import org.koin.dsl.module.module
 val mainModule = module {
   single { Router() }
 
-  screen(MAIN_SCREEN) { MainScreen(get(), MAIN_SCREEN) }
+  screen(MainScreen.Tag) { MainScreen(get()) }
   presenter { MainPresenter(get()) }
 
   /**
    * Container
    */
-  screen(CONTAINER_SCREEN_MAIN) { MainContainerScreen(get(), CONTAINER_SCREEN_MAIN) }
+  screen(MainContainerScreen.Tag) { MainContainerScreen(get()) }
   presenter { MainContainerPresenter(get()) }
 
-  screen(CONTAINER_SCREEN_FIRST) { ContainerFirstScreen(get(), CONTAINER_SCREEN_FIRST) }
+  screen(ContainerFirstScreen.Tag) { ContainerFirstScreen(get()) }
   presenter { ContainerFirstPresenter(get()) }
 
-  screen(CONTAINER_SCREEN_SECOND) { ContainerSecondScreen(get(), CONTAINER_SCREEN_SECOND) }
+  screen(ContainerSecondScreen.Tag) { ContainerSecondScreen(get()) }
   presenter { ContainerSecondPresenter(get()) }
 
   /**
    * ViewPager
    */
-  screen(PAGER_SCREEN_MAIN) { MainPagerScreen(get(), PAGER_SCREEN_MAIN) }
+  screen(MainPagerScreen.Tag) { MainPagerScreen(get()) }
   presenter { MainPagerPresenter(get()) }
 
-  screen(PAGE_SCREEN_FIRST) { PageFirstScreen(get(), PAGE_SCREEN_FIRST) }
+  screen(PageFirstScreen.Tag) { PageFirstScreen(get()) }
   presenter { PageFirstPresenter(get()) }
 
-  screen(PAGE_SCREEN_SECOND) { PageSecondScreen(get(), PAGE_SCREEN_SECOND) }
+  screen(PageSecondScreen.Tag) { PageSecondScreen(get()) }
   presenter { PageSecondPresenter(get()) }
 
-  screen(PAGE_SCREEN_THIRD) { PageThirdScreen(get(), PAGE_SCREEN_THIRD) }
+  screen(PageThirdScreen.Tag) { PageThirdScreen(get()) }
   presenter { PageThirdPresenter(get()) }
 
 }
