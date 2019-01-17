@@ -1,6 +1,6 @@
 package com.sulatskovalex.screensexample.pager.screens.second
 
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

@@ -1,15 +1,14 @@
 package com.github.sulatskovalex.screens
 
-import android.support.annotation.CallSuper
-import android.support.v4.view.PagerAdapter
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.github.sulatskovalex.screens.Screen.Companion.Created
 import com.github.sulatskovalex.screens.Screen.Companion.Paused
 import com.github.sulatskovalex.screens.Screen.Companion.Resumed
-import org.koin.core.KoinContext
 import org.koin.standalone.StandAloneContext
 
 abstract class PagerScreen<

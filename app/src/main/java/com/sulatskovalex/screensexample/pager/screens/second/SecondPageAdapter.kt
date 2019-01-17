@@ -1,14 +1,14 @@
 package com.sulatskovalex.screensexample.pager.screens.second
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.sulatskovalex.screensexample.R
 import kotlinx.android.synthetic.main.item_second_page.view.*
 
-class SecondPageAdapter :RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SecondPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder  =
       Holder(
           LayoutInflater

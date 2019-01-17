@@ -31,12 +31,15 @@ android {
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "com.android.support:appcompat-v7:$support_version"
-  implementation "com.android.support:recyclerview-v7:$support_version"
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0'
+
   implementation "org.koin:koin-core:$koin_version"
   implementation "org.koin:koin-android:$koin_version"
+
+  implementation 'androidx.appcompat:appcompat:1.0.2'
+  implementation 'androidx.viewpager:viewpager:1.0.0'
+  implementation 'androidx.recyclerview:recyclerview:1.0.0'
 }
 
 kotlin {

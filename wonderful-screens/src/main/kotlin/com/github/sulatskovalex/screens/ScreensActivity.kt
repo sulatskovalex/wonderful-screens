@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.annotation.CallSuper
-import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatActivity
 import org.koin.dsl.context.ModuleDefinition
 
 abstract class ScreensActivity : AppCompatActivity() {

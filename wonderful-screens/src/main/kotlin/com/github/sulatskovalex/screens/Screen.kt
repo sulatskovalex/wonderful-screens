@@ -1,10 +1,13 @@
 package com.github.sulatskovalex.screens
 
-import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
 
 abstract class Screen<S : Screen<S, P>, P : Presenter<P, S>>(protected val presenter: P) {
 
@@ -83,8 +86,11 @@ abstract class Screen<S : Screen<S, P>, P : Presenter<P, S>>(protected val prese
   }
 }
 
-open class Presenter<P : Presenter<P, S>, S : Screen<S, P>>(protected val rootRouter: Router) {
-  protected val jobs = mutableListOf<Job>()
+open class Presenter<P : Presenter<P, S>, S : Screen<S, P>>(protected val rootRouter: Router): CoroutineScope {
+
+  private val job = Job()
+  override val coroutineContext: CoroutineContext = job + Dispatchers.Main
+
   lateinit var screen: S
     internal set
   var argument: Any = Unit
@@ -93,16 +99,12 @@ open class Presenter<P : Presenter<P, S>, S : Screen<S, P>>(protected val rootRo
       field = value
       onArgumentChanged(prev, field)
     }
-
-  protected open fun onArgumentChanged(prevArg: Any, newArg: Any) {
-
-  }
-
+  protected open fun onArgumentChanged(prevArg: Any, newArg: Any) { }
   open fun onResume() {}
   open fun onCreate() {}
   open fun onPause() {}
   @CallSuper
   open fun onDestroy() {
-    jobs.forEach { it.cancel() }
+    job.cancel()
   }
 }

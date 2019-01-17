@@ -1,9 +1,9 @@
 package com.sulatskovalex.screensexample.pager
 
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.viewpager.widget.ViewPager
 import com.github.sulatskovalex.screens.PagerScreen
 import com.sulatskovalex.screensexample.R
 import com.sulatskovalex.screensexample.pager.screens.first.PageFirstScreen

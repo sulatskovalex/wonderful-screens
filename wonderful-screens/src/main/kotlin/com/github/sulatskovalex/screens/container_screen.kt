@@ -1,9 +1,9 @@
 package com.github.sulatskovalex.screens
 
-import android.support.annotation.CallSuper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 
 abstract class ContainerScreen<
     S : ContainerScreen<S, P>,
