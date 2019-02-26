@@ -64,7 +64,7 @@ abstract class ScreensActivity : AppCompatActivity() {
   }
 
   @CallSuper
-  override fun onConfigurationChanged(newConfig: Configuration?) {
+  override fun onConfigurationChanged(newConfig: Configuration) {
     configurationChangedHandler?.onConfigurationChanged(newConfig)
     super.onConfigurationChanged(newConfig)
   }
